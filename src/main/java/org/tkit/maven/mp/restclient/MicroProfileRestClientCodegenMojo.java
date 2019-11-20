@@ -311,8 +311,8 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
     /**
      * Group prefix.
      */
-    @Parameter(name = "groupPrefix", required = false)
-    private String groupPrefix;
+    @Parameter(name = "pathPrefix", required = false)
+    private String pathPrefix;
 
     /**
      * Api suffix.
@@ -385,6 +385,12 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
      */
     @Parameter(name = "useBeanValidation", required = false, defaultValue = "true")
     private Boolean useBeanValidation;
+
+    /**
+     * Use bean validation.
+     */
+    @Parameter(name = "apiInterfaceDoc", required = false, defaultValue = "true")
+    private Boolean apiInterfaceDoc;
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -590,7 +596,7 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
         configurator.addAdditionalProperty(INTERFACE_ONLY, interfaceOnly);
         configurator.addAdditionalProperty(BEAN_PARAM_SUFFIX, beanParamSuffix);
         configurator.addAdditionalProperty(BEAN_PARAM_COUNT, beanParamCount);
-        configurator.addAdditionalProperty(GROUP_PREFIX, groupPrefix);
+        configurator.addAdditionalProperty(PATH_PREFIX, pathPrefix);
         configurator.addAdditionalProperty(API_SUFFIX, apiSuffix);
         configurator.addAdditionalProperty(PROVIDERS, providers);
         configurator.addAdditionalProperty(ANNOTATIONS, annotations);
@@ -601,6 +607,8 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
         configurator.addAdditionalProperty(FIELD_GEN, fieldGen);
         configurator.addAdditionalProperty(DATE_LIBRARY, dateLibrary);
         configurator.addAdditionalProperty(USE_BEAN_VALIDATION, useBeanValidation);
+        configurator.addAdditionalProperty(API_INTERFACE_DOC, apiInterfaceDoc);
+
 
         final ClientOptInput input = configurator.toClientOptInput();
         final CodegenConfig config = input.getConfig();

@@ -18,73 +18,180 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The micro-profile client code generator.
+ */
 @Slf4j
 public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodegen {
 
+    /**
+     * The key for lombok data.
+     */
     private static final String LOMBOK_DATA = "lombokData";
 
+    /**
+     * The key for field public.
+     */
     private static final String FIELD_PUBLIC = "fieldPublic";
 
+    /**
+     * The key for generate getter setter.
+     */
     private static final String GENERATE_GETTER_SETTER = "generateGetterSetter";
 
+    /**
+     * The key for generate equals.
+     */
     private static final String GENERATE_EQUALS = "generateEquals";
 
+    /**
+     * The key for api interface doc.
+     */
     private static final String GENERATE_TO_STRING = "generateToString";
 
+    /**
+     * The key for jackson.
+     */
     private static final String JACKSON = "jackson";
 
+    /**
+     * The key for jsonb.
+     */
     private static final String JSONB = "jsonb";
 
+    /**
+     * The key for interface only.
+     */
     static final String INTERFACE_ONLY = "interfaceOnly";
 
+    /**
+     * The key for formatter.
+     */
     static final String FORMATTER = "formatter";
 
+    /**
+     * The key for api name.
+     */
     static final String API_NAME = "apiName";
 
-    static final String GROUP_PREFIX = "groupPrefix";
+    /**
+     * The key for path prefix.
+     */
+    static final String PATH_PREFIX = "pathPrefix";
 
+    /**
+     * The key for api interface doc.
+     */
     static final String API_SUFFIX = "apiSuffix";
 
+    /**
+     * The key for providers.
+     */
     static final String PROVIDERS = "providers";
 
+    /**
+     * The key for has providers.
+     */
     private static final String HAS_PROVIDERS = "hasProviders";
 
+    /**
+     * The key for api interface doc.
+     */
     static final String ANNOTATIONS = "annotations";
 
+    /**
+     * The key for model annotations.
+     */
     private static final String HAS_ANNOTATIONS = "hasAnnotations";
 
+    /**
+     * The key for api interface doc.
+     */
     static final String MODEL_ANNOTATIONS = "modelAnnotations";
 
+    /**
+     * The key for has model annotations.
+     */
     private static final String HAS_MODEL_ANNOTATIONS = "hasModelAnnotations";
 
+    /**
+     * The key for rest client.
+     */
     static final String REST_CLIENT = "restClient";
 
+    /**
+     * The key for bean parameter suffix.
+     */
     static final String BEAN_PARAM_SUFFIX = "beanParamSuffix";
 
+    /**
+     * The key for bean parameter count.
+     */
     static final String BEAN_PARAM_COUNT = "beanParamCount";
 
+    /**
+     * The key for return response flag.
+     */
     static final String RETURN_RESPONSE = "returnResponse";
 
+    /**
+     * The key for api interface doc.
+     */
     static final String JSON_LIB = "jsonLib";
 
+    /**
+     * The key for api interface doc.
+     */
     static final String FIELD_GEN = "fieldGen";
 
+    /**
+     * The key for api interface doc.
+     */
     static final String USE_BEAN_VALIDATION = "useBeanValidation";
 
+    /**
+     * The key for api interface doc.
+     */
+    static final String API_INTERFACE_DOC = "apiInterfaceDoc";
+
+    /**
+     * The list of generated files.
+     */
     private List<String> outputFiles = new ArrayList<>();
 
+    /**
+     * The api suffix.
+     */
     private String apiSuffix = "Api";
 
+    /**
+     * Use the formatter flag.
+     */
     private boolean format = true;
 
+    /**
+     * The api name.
+     */
     private String apiName = null;
 
-    private String groupPrefix = null;
+    /**
+     * The path prefix.
+     */
+    private String pathPrefix = null;
 
+    /**
+     * The bean parameter suffix.
+     */
     private String beanParamSuffix = "BeanParam";
 
+    /**
+     * The bean parameter count.
+     */
     private int beanParamCount = 4;
 
+    /**
+     * The default constructor.
+     */
     public MicroProfileRestClientCodegen() {
         super();
         invokerPackage = "io.swagger.api";
@@ -94,16 +201,16 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         modelPackage = "model";
         additionalProperties.put("title", title);
 
-//        additionalProperties.put(PROVIDERS, null);
-//        additionalProperties.put(REST_CLIENT, true);
-//        additionalProperties.put(BEAN_PARAM_SUFFIX, beanParamSuffix);
-//        additionalProperties.put(LOMBOK_DATA, false);
-//        additionalProperties.put(FIELD_PUBLIC, true);
-//        additionalProperties.put(JSONB, true);
-//        additionalProperties.put(JACKSON, false);
-//        additionalProperties.put(GENERATE_GETTER_SETTER, false);
-//        additionalProperties.put(API_SUFFIX, apiSuffix);
-//        additionalProperties.put(RETURN_RESPONSE, true);
+        additionalProperties.put(PROVIDERS, null);
+        additionalProperties.put(REST_CLIENT, true);
+        additionalProperties.put(BEAN_PARAM_SUFFIX, beanParamSuffix);
+        additionalProperties.put(LOMBOK_DATA, false);
+        additionalProperties.put(FIELD_PUBLIC, true);
+        additionalProperties.put(JSONB, true);
+        additionalProperties.put(JACKSON, false);
+        additionalProperties.put(GENERATE_GETTER_SETTER, false);
+        additionalProperties.put(API_SUFFIX, apiSuffix);
+        additionalProperties.put(RETURN_RESPONSE, true);
 
         for (int i = 0; i < cliOptions.size(); i++) {
             if (CodegenConstants.LIBRARY.equals(cliOptions.get(i).getOpt())) {
@@ -120,26 +227,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         library.setEnum(supportedLibraries);
         cliOptions.add(library);
 
-//        cliOptions.add(CliOption.newString(GROUP_PREFIX, "Group path prefix to group operation to interface. For example groupPrefix=v1/ v1/process to process interface").defaultValue(groupPrefix));
-//        cliOptions.add(CliOption.newBoolean(FORMATTER, "Google formatter source code.").defaultValue(String.valueOf(format)));
-//        cliOptions.add(CliOption.newString(PROVIDERS, "List of register providers @RegisterProvider('class_name') annotation on the interface. (Separator #)").defaultValue(null));
-//        cliOptions.add(CliOption.newBoolean(REST_CLIENT, "Generate the @RegisterRestClient annotation on the interface.").defaultValue(String.valueOf(true)));
-//        cliOptions.add(CliOption.newBoolean(RETURN_RESPONSE, "Return jaxrs response.").defaultValue(String.valueOf(true)));
-//        cliOptions.add(CliOption.newBoolean(INTERFACE_ONLY, "Interface only.").defaultValue(String.valueOf(true)));
-//        cliOptions.add(CliOption.newBoolean(JACKSON, "Use the jackson annotation.").defaultValue(String.valueOf(false)));
-//        cliOptions.add(CliOption.newBoolean(JSONB, "Use the jsonb property annotation for pojo.").defaultValue(String.valueOf(true)));
-//        cliOptions.add(CliOption.newBoolean(LOMBOK_DATA, "Use the lombok @Data annotation for pojo.").defaultValue(String.valueOf(false)));
-//        cliOptions.add(CliOption.newBoolean(FIELD_PUBLIC, "Public fields in the pojo.").defaultValue(String.valueOf(true)));
-//        cliOptions.add(CliOption.newBoolean(GENERATE_GETTER_SETTER, "Generate getter and setter for pojo.").defaultValue(String.valueOf(false)));
-//        cliOptions.add(CliOption.newBoolean(GENERATE_TO_STRING, "Generate toString method for pojo.").defaultValue(String.valueOf(false)));
-//        cliOptions.add(CliOption.newBoolean(GENERATE_EQUALS, "Generate equals/hash method for pojo.").defaultValue(String.valueOf(false)));
-//        cliOptions.add(CliOption.newString(API_SUFFIX, "Name of the api client class suffic.").defaultValue(apiSuffix));
-//        cliOptions.add(CliOption.newString(API_NAME, "Name of the api client class.").defaultValue(apiName));
-//        cliOptions.add(CliOption.newString(BEAN_PARAM_SUFFIX, "The bean parameter suffix.").defaultValue(beanParamSuffix));
-//        cliOptions.add(CliOption.newString(BEAN_PARAM_COUNT, "Generate the bean for more than {beanParamCount} parameters. Disable generator -1").defaultValue(String.valueOf(beanParamCount)));
-
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void processOpts() {
         super.processOpts();
@@ -158,8 +250,8 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
             apiName = (String) additionalProperties.get(API_NAME);
         }
 
-        if (additionalProperties.containsKey(GROUP_PREFIX)) {
-            groupPrefix = (String) additionalProperties.get(GROUP_PREFIX);
+        if (additionalProperties.containsKey(PATH_PREFIX)) {
+            pathPrefix = (String) additionalProperties.get(PATH_PREFIX);
         }
 
         if (additionalProperties.containsKey(BEAN_PARAM_SUFFIX)) {
@@ -173,7 +265,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
 
         format = updateBoolean(FORMATTER, format);
         updateBoolean(REST_CLIENT, true);
-
+        updateBoolean(API_INTERFACE_DOC, true);
 
         writePropertyBack(FIELD_PUBLIC, true);
         writePropertyBack(LOMBOK_DATA, false);
@@ -251,6 +343,12 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         return "tkit-mp-restclient";
     }
 
+    /**
+     * Updates the boolean parameter value.
+     * @param name the name of the parameter.
+     * @param value the default value.
+     * @return the value or default value of the parameter.
+     */
     private boolean updateBoolean(String name, boolean value) {
         boolean result = value;
         if (additionalProperties.containsKey(name)) {
@@ -260,13 +358,16 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         return result;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public String toApiName(String name) {
         if (apiName != null) {
             return apiName;
         }
-        if (groupPrefix != null) {
-            name = name.replaceFirst(groupPrefix, "");
+        if (pathPrefix != null) {
+            name = name.replaceFirst(pathPrefix, "");
         }
         String computed = name;
         if (computed.length() == 0) {
@@ -276,11 +377,14 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         return camelize(computed) + apiSuffix;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co, Map<String, List<CodegenOperation>> operations) {
         String basePath = resourcePath;
-        if (groupPrefix != null) {
-            basePath = basePath.replaceFirst(groupPrefix, "");
+        if (pathPrefix != null) {
+            basePath = basePath.replaceFirst(pathPrefix, "");
         }
         if (basePath.startsWith("/")) {
             basePath = basePath.substring(1);
@@ -298,8 +402,8 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
             }
             co.subresourceOperation = !co.path.isEmpty();
         }
-        if (groupPrefix != null) {
-            co.baseName = groupPrefix + basePath;
+        if (pathPrefix != null) {
+            co.baseName = pathPrefix + basePath;
             if (co.path.startsWith("/")) {
                 co.path = co.path.substring(1);
             }
@@ -311,6 +415,9 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         opList.add(co);
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public boolean shouldOverwrite(String filename) {
         if (outputFiles != null) {
@@ -319,6 +426,9 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         return super.shouldOverwrite(filename);
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void processOpenAPI(OpenAPI openAPI) {
         if (format) {
@@ -342,6 +452,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         super.processOpenAPI(openAPI);
     }
 
+    /**
+     * Update the codegen extra annotation list.
+     * @param name the class name.
+     * @return returns {@code true} if there is extra annotations list.
+     */
     private boolean updateCodegenExtraAnnotationList(String name) {
         if (additionalProperties.containsKey(name)) {
 
@@ -367,6 +482,9 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         return false;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, Map<String, Schema> schemas, OpenAPI openAPI) {
         CodegenOperation op = super.fromOperation(path, httpMethod, operation, schemas, openAPI);
@@ -378,6 +496,9 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         return e;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         super.postProcessModelProperty(model, property);
