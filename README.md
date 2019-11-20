@@ -8,41 +8,41 @@ Tkit microprofile  rest client generator plugin
 ## Goal: codegen
 
 ```xml
-			<plugin>
-				<groupId>org.tkit.maven</groupId>
-				<artifactId>tkit-mp-restclient-plugin</artifactId>
-				<version>0.1.0-SNAPSHOT</version>
-				<executions>
-					<execution>
-						<id>test</id>
-						<goals>
-							<goal>codegen</goal>
-						</goals>
-						<configuration>
-							<inputSpec>src/main/resources/clients/openapi.yaml</inputSpec>
-							<output>${project.build.directory}/generated-sources/mprestclient</output>
-							<apiPackage>gen.org.tkit.test</apiPackage>
-							<modelPackage>gen.org.tkit.test.model</modelPackage>
-							<pathPrefix>v2/</pathPrefix>
-							<fieldGen>LOMBOK</fieldGen>
-							<jsonLib>JSONB</jsonLib>
-							<providers>
-								<provider>org.lorislab.quarkus.jel.log.interceptor.RestClientLogInterceptor</provider>
-							</providers>
-							<annotations>
-								<annotation>org.lorislab.quarkus.jel.log.interceptor.LoggerService</annotation>
-							</annotations>
-							<modelAnnotations>
-								<modelAnnotation>lombok.ToString</modelAnnotation>
-								<modelAnnotation>io.quarkus.runtime.annotations.RegisterForReflection</modelAnnotation>
-							</modelAnnotations>
-							<configOptions>
-								<sourceFolder>test</sourceFolder>
-							</configOptions>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+<plugin>
+    <groupId>org.tkit.maven</groupId>
+    <artifactId>tkit-mp-restclient-plugin</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <executions>
+        <execution>
+            <id>test</id>
+            <goals>
+                <goal>codegen</goal>
+            </goals>
+            <configuration>
+                <inputSpec>src/main/resources/clients/openapi.yaml</inputSpec>
+                <output>${project.build.directory}/generated-sources/mprestclient</output>
+                <apiPackage>gen.org.tkit.test</apiPackage>
+                <modelPackage>gen.org.tkit.test.model</modelPackage>
+                <pathPrefix>v2/</pathPrefix>
+                <fieldGen>LOMBOK</fieldGen>
+                <jsonLib>JSONB</jsonLib>
+                <providers>
+                    <provider>org.lorislab.quarkus.jel.log.interceptor.RestClientLogInterceptor</provider>
+                </providers>
+                <annotations>
+                    <annotation>org.lorislab.quarkus.jel.log.interceptor.LoggerService</annotation>
+                </annotations>
+                <modelAnnotations>
+                    <modelAnnotation>lombok.ToString</modelAnnotation>
+                    <modelAnnotation>io.quarkus.runtime.annotations.RegisterForReflection</modelAnnotation>
+                </modelAnnotations>
+                <configOptions>
+                    <sourceFolder>test</sourceFolder>
+                </configOptions>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
 ```
 
 #### Parameters
