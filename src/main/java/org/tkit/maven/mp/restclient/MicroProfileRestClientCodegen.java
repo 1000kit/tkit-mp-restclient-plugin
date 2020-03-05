@@ -1,3 +1,18 @@
+/*
+ * Copyright 2020 tkit.org.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.tkit.maven.mp.restclient;
 
 import com.google.googlejavaformat.java.Formatter;
@@ -85,16 +100,6 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     static final String API_SUFFIX = "apiSuffix";
 
     /**
-     * The key for providers.
-     */
-    static final String PROVIDERS = "providers";
-
-    /**
-     * The key for has providers.
-     */
-    private static final String HAS_PROVIDERS = "hasProviders";
-
-    /**
      * The key for api interface doc.
      */
     static final String ANNOTATIONS = "annotations";
@@ -113,11 +118,6 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      * The key for has model annotations.
      */
     private static final String HAS_MODEL_ANNOTATIONS = "hasModelAnnotations";
-
-    /**
-     * The key for rest client.
-     */
-    static final String REST_CLIENT = "restClient";
 
     /**
      * The key for bean parameter suffix.
@@ -196,13 +196,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         super();
         invokerPackage = "io.swagger.api";
         artifactId = "swagger-jaxrs-server";
-        outputFolder = "generated-code/tkit-mp-restclient";
+        outputFolder = "generated-code/mp-rest-client";
         apiPackage = "api";
         modelPackage = "model";
         additionalProperties.put("title", title);
 
-        additionalProperties.put(PROVIDERS, null);
-        additionalProperties.put(REST_CLIENT, true);
         additionalProperties.put(BEAN_PARAM_SUFFIX, beanParamSuffix);
         additionalProperties.put(LOMBOK_DATA, false);
         additionalProperties.put(FIELD_PUBLIC, true);
@@ -238,7 +236,6 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
 
         writePropertyBack(USE_BEANVALIDATION, useBeanValidation);
 
-        additionalProperties.put(HAS_PROVIDERS, updateCodegenExtraAnnotationList(PROVIDERS));
         additionalProperties.put(HAS_ANNOTATIONS, updateCodegenExtraAnnotationList(ANNOTATIONS));
         additionalProperties.put(HAS_MODEL_ANNOTATIONS, updateCodegenExtraAnnotationList(MODEL_ANNOTATIONS));
 
@@ -264,7 +261,6 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         }
 
         format = updateBoolean(FORMATTER, format);
-        updateBoolean(REST_CLIENT, true);
         updateBoolean(API_INTERFACE_DOC, true);
 
         writePropertyBack(FIELD_PUBLIC, true);
@@ -296,9 +292,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
             switch (jsonLib) {
                 case JSONB:
                     writePropertyBack(JSONB, true);
+                    writePropertyBack(JACKSON, false);
                     break;
                 case JACKSON:
                     writePropertyBack(JACKSON, true);
+                    writePropertyBack(JSONB, false);
                     break;
             }
         }
@@ -324,7 +322,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      */
     @Override
     public String getName() {
-        return "tkit-mp-restclient-plugin";
+        return "tkit-mp-rest-client-plugin";
     }
 
     /**
@@ -340,7 +338,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      */
     @Override
     public String getDefaultTemplateDir() {
-        return "tkit-mp-restclient";
+        return "tkit-mp-rest-client";
     }
 
     /**
@@ -440,7 +438,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
                         log.info("Formatter source code: {}", file);
                         Path path = Paths.get(file);
                         String sourceString = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-                        sourceString = gf.formatSource(sourceString);
+                        sourceString = gf.formatSourceAndFixImports(sourceString);
                         Files.write(path, sourceString.getBytes(StandardCharsets.UTF_8));
                     } catch (Exception ex) {
                         log.error("Skip format source code of the file {} ", file);
@@ -459,23 +457,9 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      */
     private boolean updateCodegenExtraAnnotationList(String name) {
         if (additionalProperties.containsKey(name)) {
-
             List<String> items = (List<String>) additionalProperties.get(name);
             if (items != null && !items.isEmpty()) {
-                List<CodegenExtraAnnotation> data = new ArrayList<>();
-                items.forEach(item -> {
-                    int index = item.lastIndexOf('.');
-                    CodegenExtraAnnotation p = new CodegenExtraAnnotation();
-                    String tmp = item;
-                    int index2 = item.lastIndexOf('(');
-                    if (index2 > -1) {
-                        tmp = tmp.substring(0, index2);
-                    }
-                    p.setImports(tmp);
-                    p.setName(item.substring(index + 1));
-                    data.add(p);
-                });
-                additionalProperties.put(name, data);
+                additionalProperties.put(name, items);
                 return true;
             }
         }

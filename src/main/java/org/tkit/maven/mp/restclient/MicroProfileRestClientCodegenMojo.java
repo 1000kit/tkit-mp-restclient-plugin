@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 tkit.org.
+ * Copyright 2020 tkit.org.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.tkit.maven.mp.restclient;
 
 import io.swagger.codegen.v3.*;
 import io.swagger.codegen.v3.config.CodegenConfigurator;
+import io.swagger.codegen.v3.generators.java.AbstractJavaCodegen;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -26,7 +27,6 @@ import org.apache.maven.project.MavenProject;
 
 import static io.swagger.codegen.v3.config.CodegenConfiguratorUtils.*;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.tkit.maven.mp.restclient.MicroProfileRestClientCodegen.*;
 
 import java.io.File;
 import java.util.HashMap;
@@ -45,8 +45,8 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
     /**
      * Location of the output directory.
      */
-    @Parameter(name = "output", property = "tkit.mp.restclient.output",
-            defaultValue = "${project.build.directory}/generated-sources/tkit-mp-restclient")
+    @Parameter(name = "output", property = "mp.rest-client.output",
+            defaultValue = "${project.build.directory}/generated-sources/mp-rest-client")
     private File output;
 
     /**
@@ -162,7 +162,7 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
      * A map of language-specific parameters as passed with the -c option to the command line
      */
     @Parameter(name = "configOptions")
-    private Map<?, ?> configOptions;
+    private Map<?, ?> configOptions = new HashMap<>();
 
     /**
      * A map of types and the types they should be instantiated as
@@ -288,7 +288,7 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
     @Parameter(readonly = true, required = true, defaultValue = "${project}")
     private MavenProject project;
 
-    /// TKIT parameters
+    /// EXTENDS parameters
 
     /**
      * Formatter google.
@@ -321,12 +321,6 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
     private String apiSuffix;
 
     /**
-     * The list of provides
-     */
-    @Parameter(name = "providers")
-    private List<String> providers;
-
-    /**
      * The list of annotations.
      */
     @Parameter(name = "annotations")
@@ -337,12 +331,6 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
      */
     @Parameter(name = "modelAnnotations")
     private List<String> modelAnnotations;
-
-    /**
-     * Generate rest client annotation.
-     */
-    @Parameter(name = "restClient", required = false, defaultValue = "true")
-    private Boolean restClient;
 
     /**
      * Return response.
@@ -591,23 +579,21 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
             }
         }
 
-        configurator.addAdditionalProperty(FORMATTER, formatter);
-        configurator.addAdditionalProperty(API_NAME, apiName);
-        configurator.addAdditionalProperty(INTERFACE_ONLY, interfaceOnly);
-        configurator.addAdditionalProperty(BEAN_PARAM_SUFFIX, beanParamSuffix);
-        configurator.addAdditionalProperty(BEAN_PARAM_COUNT, beanParamCount);
-        configurator.addAdditionalProperty(PATH_PREFIX, pathPrefix);
-        configurator.addAdditionalProperty(API_SUFFIX, apiSuffix);
-        configurator.addAdditionalProperty(PROVIDERS, providers);
-        configurator.addAdditionalProperty(ANNOTATIONS, annotations);
-        configurator.addAdditionalProperty(MODEL_ANNOTATIONS, modelAnnotations);
-        configurator.addAdditionalProperty(REST_CLIENT, restClient);
-        configurator.addAdditionalProperty(RETURN_RESPONSE, returnResponse);
-        configurator.addAdditionalProperty(JSON_LIB, jsonLib);
-        configurator.addAdditionalProperty(FIELD_GEN, fieldGen);
-        configurator.addAdditionalProperty(DATE_LIBRARY, dateLibrary);
-        configurator.addAdditionalProperty(USE_BEAN_VALIDATION, useBeanValidation);
-        configurator.addAdditionalProperty(API_INTERFACE_DOC, apiInterfaceDoc);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.FORMATTER, formatter);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.API_NAME, apiName);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.INTERFACE_ONLY, interfaceOnly);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.BEAN_PARAM_SUFFIX, beanParamSuffix);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.BEAN_PARAM_COUNT, beanParamCount);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.PATH_PREFIX, pathPrefix);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.API_SUFFIX, apiSuffix);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.ANNOTATIONS, annotations);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.MODEL_ANNOTATIONS, modelAnnotations);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.RETURN_RESPONSE, returnResponse);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.JSON_LIB, jsonLib);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.FIELD_GEN, fieldGen);
+        configurator.addAdditionalProperty(AbstractJavaCodegen.DATE_LIBRARY, dateLibrary);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.USE_BEAN_VALIDATION, useBeanValidation);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.API_INTERFACE_DOC, apiInterfaceDoc);
 
 
         final ClientOptInput input = configurator.toClientOptInput();

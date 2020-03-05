@@ -23,14 +23,15 @@ Tkit microprofile  rest client generator plugin
                 <output>${project.build.directory}/generated-sources/mprestclient</output>
                 <apiPackage>gen.org.tkit.test</apiPackage>
                 <modelPackage>gen.org.tkit.test.model</modelPackage>
+                <generateSupportingFiles>false</generateSupportingFiles>
                 <pathPrefix>v2/</pathPrefix>
                 <fieldGen>LOMBOK</fieldGen>
                 <jsonLib>JSONB</jsonLib>
-                <providers>
-                    <provider>org.lorislab.quarkus.jel.log.interceptor.RestClientLogInterceptor</provider>
-                </providers>
+                <apiInterfaceDoc>false</apiInterfaceDoc>
                 <annotations>
-                    <annotation>org.lorislab.quarkus.jel.log.interceptor.LoggerService</annotation>
+                    <annotation>org.eclipse.microprofile.rest.client.annotation.RegisterProvider(org.tkit.quarkus.log.interceptor.RestClientLogInterceptor.class)</annotation>
+                    <annotation>org.tkit.quarkus.log.interceptor.LoggerService</annotation>
+                    <annotation>org.eclipse.microprofile.rest.client.inject.RegisterRestClient(configKey="my-client-key")</annotation>
                 </annotations>
                 <modelAnnotations>
                     <modelAnnotation>lombok.ToString</modelAnnotation>
@@ -57,7 +58,6 @@ Extended parameters:
 | interfaceOnly | true | | The interface only |
 | pathPrefix | | | The path prefix for all interfaces. Example 'v2/' |
 | apiSuffix | RestClient | | The api interface suffix |
-| providers | | | The list of rest client providers. Each provider is java fully qualified class name |
 | annotations | | | The list of custom annotations for the interface. |
 | modelAnnotations | | | The list of custom annotations for the model. |
 | restClient | true | | The flag to generate the micro-profile rest client for the interface. |
