@@ -112,7 +112,7 @@
                 <artifactId>maven-plugin-plugin</artifactId>
                 <version>3.6.0</version>
                 <configuration>
-                    <goalPrefix>tkit-mp-rest-client</goalPrefix>
+                    <goalPrefix>tkit-mp-restclient</goalPrefix>
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                 </configuration>
                 <executions>
