@@ -435,7 +435,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
                 Formatter gf = new Formatter();
                 outputFiles.forEach(file -> {
                     try {
-                        log.info("Formatter source code: {}", file);
+                        log.debug("Formatter source code: {}", file);
                         Path path = Paths.get(file);
                         String sourceString = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
                         sourceString = gf.formatSourceAndFixImports(sourceString);
