@@ -484,6 +484,18 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      * {@inheritDoc }
      */
     @Override
+    public CodegenModel fromModel(String name, Schema schema, Map<String, Schema> allSchemas) {
+        CodegenModel codegenModel = super.fromModel(name, schema, allSchemas);
+        if(codegenModel.description != null) {
+            codegenModel.imports.remove("Schema");
+        }
+        return codegenModel;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
         super.postProcessModelProperty(model, property);
         model.imports.remove("Schema");
