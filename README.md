@@ -29,7 +29,6 @@ Tkit microprofile  rest client generator plugin
                 <jsonLib>JSONB</jsonLib>
                 <apiInterfaceDoc>false</apiInterfaceDoc>
                 <annotations>
-                    <annotation>org.eclipse.microprofile.rest.client.annotation.RegisterProvider(org.tkit.quarkus.log.interceptor.RestClientLogInterceptor.class)</annotation>
                     <annotation>org.tkit.quarkus.log.interceptor.LoggerService</annotation>
                     <annotation>org.eclipse.microprofile.rest.client.inject.RegisterRestClient(configKey="my-client-key")</annotation>
                 </annotations>
