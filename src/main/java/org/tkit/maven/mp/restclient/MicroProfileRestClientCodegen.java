@@ -234,6 +234,8 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     public void processOpts() {
         super.processOpts();
 
+//        importMapping.put("Schema", "org.eclipse.microprofile.openapi.annotations.media.Schema");
+
         writePropertyBack(USE_BEANVALIDATION, useBeanValidation);
 
         additionalProperties.put(HAS_ANNOTATIONS, updateCodegenExtraAnnotationList(ANNOTATIONS));
@@ -401,11 +403,15 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
             co.subresourceOperation = !co.path.isEmpty();
         }
         if (pathPrefix != null) {
-            co.baseName = pathPrefix + basePath;
-            if (co.path.startsWith("/")) {
-                co.path = co.path.substring(1);
+            if ("/".equals(pathPrefix)) {
+                co.baseName = "";
+            } else {
+                co.baseName = pathPrefix + basePath;
+                if (co.path.startsWith("/")) {
+                    co.path = co.path.substring(1);
+                }
+                co.path = co.path.replaceFirst(co.baseName, "");
             }
-            co.path = co.path.replaceFirst(co.baseName, "");
         } else {
             co.baseName = basePath;
         }
@@ -478,18 +484,6 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
             e.setBeanParam(true);
         }
         return e;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public CodegenModel fromModel(String name, Schema schema, Map<String, Schema> allSchemas) {
-        CodegenModel codegenModel = super.fromModel(name, schema, allSchemas);
-        if(codegenModel.description != null) {
-            codegenModel.imports.remove("Schema");
-        }
-        return codegenModel;
     }
 
     /**
