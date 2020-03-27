@@ -24,6 +24,7 @@ import io.swagger.v3.oas.models.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -382,41 +383,66 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      */
     @Override
     public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co, Map<String, List<CodegenOperation>> operations) {
-        String basePath = resourcePath;
-        if (pathPrefix != null) {
-            basePath = basePath.replaceFirst(pathPrefix, "");
-        }
-        if (basePath.startsWith("/")) {
-            basePath = basePath.substring(1);
-        }
-        int pos = basePath.indexOf('/');
-        if (pos > 0) {
-            basePath = basePath.substring(0, pos);
+        String restPath = resourcePath;
+        // remove the first /
+        if (restPath.startsWith("/")) {
+            restPath = restPath.substring(1);
         }
 
-        if (basePath.equals("")) {
-            basePath = "default";
+        // check the path prefix
+        if (pathPrefix != null && !pathPrefix.isEmpty()) {
+            if ("/".equals(pathPrefix)) {
+                co.baseName = "";
+                co.path = restPath;
+                co.subresourceOperation = !co.path.isEmpty();
+            } else {
+                // remove / from path prefix
+                String tmp = pathPrefix;
+                if (tmp.startsWith("/")) {
+                    tmp = tmp.substring(1);
+                }
+                // check if path start with `pathPrefix`
+                if (restPath.startsWith(tmp)) {
+                    co.baseName = tmp;
+                    int pathPrefixIndex = tmp.endsWith("/") ? tmp.length() : tmp.length() + 1;
+                    co.path = restPath.substring(pathPrefixIndex);
+                    co.subresourceOperation = !co.path.isEmpty();
+                } else {
+                    throw new IllegalStateException("Resource path `" + resourcePath + "` does not start with a prefix `" + tmp + "`");
+                }
+            }
         } else {
-            if (co.path.startsWith("/" + basePath)) {
-                co.path = co.path.substring(("/" + basePath).length());
+            // no common path prefix defined get first item of the path
+            int index = restPath.indexOf("/");
+            if (index > 0) {
+                co.baseName = restPath.substring(0, index);
+                co.path = restPath.substring(index);
+            } else {
+                // no items in the path, set path to base
+                co.baseName = restPath;
+                co.path = "";
             }
             co.subresourceOperation = !co.path.isEmpty();
         }
-        if (pathPrefix != null) {
-            if ("/".equals(pathPrefix)) {
-                co.baseName = "";
-            } else {
-                co.baseName = pathPrefix + basePath;
-                if (co.path.startsWith("/")) {
-                    co.path = co.path.substring(1);
-                }
-                co.path = co.path.replaceFirst(co.baseName, "");
-            }
-        } else {
-            co.baseName = basePath;
-        }
+
         List<CodegenOperation> opList = operations.computeIfAbsent(co.baseName, v -> new ArrayList<>());
         opList.add(co);
+
+        // check multiple operation in one class
+        int counter = 0;
+        for (CodegenOperation op : opList) {
+            if (co.operationId.equals(op.operationId)) {
+                counter++;
+            }
+        }
+        // add the tag prefix for the operation.
+        // if there are multiple nickname the same name in one class generator add suffix _<number>
+        if (counter > 1) {
+            co.nickname = camelize(tag + "-" + co.operationId, true);
+        }
+        co.operationIdLowerCase = co.operationId.toLowerCase();
+        co.operationIdCamelCase = camelize(co.operationId);
+        co.operationIdSnakeCase = underscore(co.operationId);
     }
 
     /**
@@ -425,6 +451,14 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     @Override
     public boolean shouldOverwrite(String filename) {
         if (outputFiles != null) {
+            if (outputFiles.contains(filename)) {
+                File tmp = new File(filename);
+                String f = tmp.getName().replace(".java", "");
+                log.error("Wrong plugin configuration. Please check the API schema paths and maven configuration for <apiName> and <pathPrefix>.");
+                log.error("Remove the <apiName> and <pathPrefix> element from the plugin configuration to generate java class for each REST path from the open API schema.");
+                log.error("Add the maven configuration <apiName>{}<apiName> and <pathPrefix>/</pathPrefix> to generate one java class for open API schema", f);
+                throw new IllegalStateException("File '" + tmp.getName() + "' already generated.");
+            }
             outputFiles.add(filename);
         }
         return super.shouldOverwrite(filename);
