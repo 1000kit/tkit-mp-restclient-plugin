@@ -297,6 +297,12 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
     private Boolean formatter;
 
     /**
+     * Group REST method by tags.
+     */
+    @Parameter(name = "groupByTags", required = false, defaultValue = "false")
+    private Boolean groupByTags;
+
+    /**
      * Api name.
      */
     @Parameter(name = "apiName", required = false)
@@ -580,6 +586,7 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
         }
 
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.FORMATTER, formatter);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.GROUP_BY_TAGS, groupByTags);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.API_NAME, apiName);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.INTERFACE_ONLY, interfaceOnly);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.BEAN_PARAM_SUFFIX, beanParamSuffix);

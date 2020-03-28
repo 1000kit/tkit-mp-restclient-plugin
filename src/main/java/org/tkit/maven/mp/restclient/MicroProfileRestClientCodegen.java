@@ -86,6 +86,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     static final String FORMATTER = "formatter";
 
     /**
+     * Groups REST by tags
+     */
+    static final String GROUP_BY_TAGS = "groupByTags";
+
+    /**
      * The key for api name.
      */
     static final String API_NAME = "apiName";
@@ -176,6 +181,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     private String apiName = null;
 
     /**
+     * Group REST by tags
+     */
+    private boolean groupByTags = false;
+
+    /**
      * The path prefix.
      */
     private String pathPrefix = null;
@@ -263,6 +273,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
             additionalProperties.put(BEAN_PARAM_COUNT, beanParamCount);
         }
 
+        groupByTags = updateBoolean(GROUP_BY_TAGS, groupByTags);
         format = updateBoolean(FORMATTER, format);
         updateBoolean(API_INTERFACE_DOC, true);
 
@@ -364,11 +375,8 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      */
     @Override
     public String toApiName(String name) {
-        if (apiName != null) {
+        if (!groupByTags && apiName != null) {
             return apiName;
-        }
-        if (pathPrefix != null) {
-            name = name.replaceFirst(pathPrefix, "");
         }
         String computed = name;
         if (computed.length() == 0) {
@@ -383,19 +391,27 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      */
     @Override
     public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co, Map<String, List<CodegenOperation>> operations) {
+        // groups REST services by tag
+        if (groupByTags) {
+            super.addOperationToGroup(tag, resourcePath, operation, co, operations);
+            return;
+        }
+
+        // group REST service by REST-path
         String restPath = resourcePath;
         // remove the first /
         if (restPath.startsWith("/")) {
             restPath = restPath.substring(1);
         }
 
-        // check the path prefix
-        if (pathPrefix != null && !pathPrefix.isEmpty()) {
-            if ("/".equals(pathPrefix)) {
-                co.baseName = "";
-                co.path = restPath;
-                co.subresourceOperation = !co.path.isEmpty();
-            } else {
+        // group all REST services in the schema to `/` to one file
+        if ((apiName != null && !apiName.isEmpty() && (pathPrefix == null || pathPrefix.isEmpty())) || "/".equals(pathPrefix)) {
+            co.baseName = "";
+            co.path = restPath;
+            co.subresourceOperation = !co.path.isEmpty();
+        } else {
+            // check the path prefix
+            if (pathPrefix != null && !pathPrefix.isEmpty()) {
                 // remove / from path prefix
                 String tmp = pathPrefix;
                 if (tmp.startsWith("/")) {
@@ -405,26 +421,31 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
                 if (restPath.startsWith(tmp)) {
                     co.baseName = tmp;
                     int pathPrefixIndex = tmp.endsWith("/") ? tmp.length() : tmp.length() + 1;
-                    co.path = restPath.substring(pathPrefixIndex);
+                    if (pathPrefixIndex <= restPath.length()) {
+                        co.path = restPath.substring(pathPrefixIndex);
+                    } else {
+                        co.path = "";
+                    }
                     co.subresourceOperation = !co.path.isEmpty();
                 } else {
-                    throw new IllegalStateException("Resource path `" + resourcePath + "` does not start with a prefix `" + tmp + "`");
+                    log.warn("Resource path `" + resourcePath + "` does not start with a prefix `" + tmp + "` and will be ignored!");
+                    return;
                 }
-            }
-        } else {
-            // no common path prefix defined get first item of the path
-            int index = restPath.indexOf("/");
-            if (index > 0) {
-                co.baseName = restPath.substring(0, index);
-                co.path = restPath.substring(index);
             } else {
-                // no items in the path, set path to base
-                co.baseName = restPath;
-                co.path = "";
+                // no common path prefix defined get first item of the path
+                int index = restPath.indexOf("/");
+                if (index > 0) {
+                    co.baseName = restPath.substring(0, index);
+                    co.path = restPath.substring(index);
+                } else {
+                    // no items in the path, set path to base
+                    co.baseName = restPath;
+                    co.path = "";
+                }
+                co.subresourceOperation = !co.path.isEmpty();
             }
-            co.subresourceOperation = !co.path.isEmpty();
-        }
 
+        }
         List<CodegenOperation> opList = operations.computeIfAbsent(co.baseName, v -> new ArrayList<>());
         opList.add(co);
 
@@ -436,7 +457,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
             }
         }
         // add the tag prefix for the operation.
-        // if there are multiple nickname the same name in one class generator add suffix _<number>
+        // if there are multiple nickname the same name in one class generator add suffix _<number> later
         if (counter > 1) {
             co.nickname = camelize(tag + "-" + co.operationId, true);
         }
@@ -454,9 +475,9 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
             if (outputFiles.contains(filename)) {
                 File tmp = new File(filename);
                 String f = tmp.getName().replace(".java", "");
-                log.error("Wrong plugin configuration. Please check the API schema paths and maven configuration for <apiName> and <pathPrefix>.");
-                log.error("Remove the <apiName> and <pathPrefix> element from the plugin configuration to generate java class for each REST path from the open API schema.");
-                log.error("Add the maven configuration <apiName>{}<apiName> and <pathPrefix>/</pathPrefix> to generate one java class for open API schema", f);
+                log.error("Wrong plugin configuration. Please check the API schema paths and maven configuration for <groupByTags>, <apiName> and <pathPrefix>.");
+                log.error("Add the maven configuration <apiName>{}<apiName>, remove <pathPrefix> and <groupByTags> to generate one java class for open API schema", f);
+                log.error("Remove the <groupByTags> if you what to have one file defined by <groupByTags> and the API schema has more tags.");
                 throw new IllegalStateException("File '" + tmp.getName() + "' already generated.");
             }
             outputFiles.add(filename);
