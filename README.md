@@ -19,8 +19,8 @@ two java classes `AdminRestClient` and `UserRestClient`
 is default swagger generator but it could generated wrong java classes; depend on your openAPI schema and the parameter 
 `apiName` and `pathPrefix` will be ignored.
 
-> Method of the java class are base on the `operationId`. If there are same `operationId` in the same java class the tag 
-> of the operation is add as prefix to the method. If there are same `tag`+ `operationId` methods in the same java classes 
+> Method of the java class are base on the `operationId`. If there are multiple `operationId` methods in the java class the tag 
+> of the operation is add as prefix to the method. If there are multiple `tag`+ `operationId` methods in the java class 
 > generator will add suffix `_<number>` to the method.
  
 ## Goal: codegen
