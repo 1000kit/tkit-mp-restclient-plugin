@@ -46,6 +46,7 @@ is default swagger generator but it could generated wrong java classes; depend o
                 <fieldGen>LOMBOK</fieldGen>
                 <jsonLib>JACKSON</jsonLib>                
                 <annotations>
+                    <annotation>javax.inject.Singleton</annotation>
                     <annotation>org.tkit.quarkus.log.interceptor.LoggerService</annotation>
                     <annotation>org.eclipse.microprofile.rest.client.inject.RegisterRestClient(configKey="my-client-key")</annotation>
                 </annotations>
