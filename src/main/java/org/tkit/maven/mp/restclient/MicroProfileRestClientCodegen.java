@@ -48,6 +48,16 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     /**
      * The key for field public.
      */
+    private static final String IMPL_REST_CLASS = "implRestClass";
+
+    /**
+     * The key for field public.
+     */
+    static final String IMPL_PROXY = "implProxy";
+
+    /**
+     * The key for field public.
+     */
     private static final String FIELD_PUBLIC = "fieldPublic";
 
     /**
@@ -108,6 +118,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     /**
      * The key for api interface doc.
      */
+    static final String PROXY_CLIENT_CLASS = "proxyClientClass";
+
+    /**
+     * The key for api interface doc.
+     */
     static final String ANNOTATIONS = "annotations";
 
     /**
@@ -149,6 +164,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      * The key for api interface doc.
      */
     static final String FIELD_GEN = "fieldGen";
+
+    /**
+     * The implementation type.
+     */
+    static final String IMPL_TYPE = "implType";
 
     /**
      * The key for api interface doc.
@@ -245,8 +265,6 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     public void processOpts() {
         super.processOpts();
 
-//        importMapping.put("Schema", "org.eclipse.microprofile.openapi.annotations.media.Schema");
-
         writePropertyBack(USE_BEANVALIDATION, useBeanValidation);
 
         additionalProperties.put(HAS_ANNOTATIONS, updateCodegenExtraAnnotationList(ANNOTATIONS));
@@ -283,8 +301,8 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         writePropertyBack(GENERATE_TO_STRING, false);
         writePropertyBack(GENERATE_GETTER_SETTER, false);
         if (additionalProperties.containsKey(FIELD_GEN)) {
-            FieldGenerator fieldgen = (FieldGenerator) additionalProperties.getOrDefault(FIELD_GEN, FieldGenerator.PUBLIC);
-            switch (fieldgen) {
+            FieldGenerator gen = (FieldGenerator) additionalProperties.getOrDefault(FIELD_GEN, FieldGenerator.PUBLIC);
+            switch (gen) {
                 case PUBLIC:
                     writePropertyBack(FIELD_PUBLIC, true);
                     break;
@@ -296,6 +314,31 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
                     writePropertyBack(GENERATE_TO_STRING, true);
                     writePropertyBack(GENERATE_GETTER_SETTER, true);
                     break;
+            }
+        }
+
+        boolean proxyImplementation = false;
+        updateBoolean(INTERFACE_ONLY, true);
+        boolean interfaceOnly = (Boolean) additionalProperties.get(INTERFACE_ONLY);
+        if (interfaceOnly) {
+            writePropertyBack(IMPL_REST_CLASS, false);
+        } else {
+            writePropertyBack(IMPL_REST_CLASS, true);
+            if (additionalProperties.containsKey(IMPL_TYPE)) {
+                ImplType impl = (ImplType) additionalProperties.getOrDefault(IMPL_TYPE, ImplType.CLASS);
+                switch (impl) {
+                    case CLASS:
+                        writePropertyBack(IMPL_REST_CLASS, true);
+                        break;
+                    case INTERFACE:
+                        writePropertyBack(IMPL_REST_CLASS, false);
+                        break;
+                    case PROXY:
+                        writePropertyBack(IMPL_REST_CLASS, true);
+                        writePropertyBack(IMPL_PROXY, true);
+                        proxyImplementation = true;
+                        break;
+                }
             }
         }
 
@@ -316,7 +359,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         }
 
         updateBoolean(RETURN_RESPONSE, true);
-        updateBoolean(INTERFACE_ONLY, true);
+
 
         if (StringUtils.isBlank(templateDir)) {
             embeddedTemplateDir = templateDir = getTemplateDir();
@@ -329,6 +372,12 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         modelDocTemplateFiles.remove("model_doc.mustache");
         apiDocTemplateFiles.remove("api_doc.mustache");
         supportingFiles.clear();
+
+        // do not generate the models. We will use the models from the rest client
+        if (proxyImplementation) {
+            modelDocTemplateFiles.clear();
+            modelTemplateFiles.clear();
+        }
     }
 
     /**
