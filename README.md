@@ -111,7 +111,7 @@ is default swagger generator but it could generated wrong java classes; depend o
 > to add the `proxyClientClass` which is the RestClient class and the `modelPackage` needs to have
 > the same value like the `RestClient`.
 
-```java
+```xml
 <plugin>
     <groupId>org.tkit.maven</groupId>
     <artifactId>tkit-mp-restclient-plugin</artifactId>
