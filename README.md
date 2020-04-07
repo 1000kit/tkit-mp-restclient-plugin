@@ -103,17 +103,89 @@ is default swagger generator but it could generated wrong java classes; depend o
 </plugin>
 ```
 
-#### Parameters
+## Goal: codegen - Proxy
+
+```java
+<plugin>
+    <groupId>org.tkit.maven</groupId>
+    <artifactId>tkit-mp-restclient-plugin</artifactId>
+    <version>0.8.0-SNAPSHOT</version>
+    <executions>
+        <execution>
+            <id>user-client</id>
+            <goals>
+                <goal>codegen</goal>
+            </goals>
+            <configuration>
+                <inputSpec>src/main/resources/user/openapi.yaml</inputSpec>
+                <output>${project.build.directory}/generated-sources/restclients</output>
+                <apiPackage>org.tkit.user.rs.proxy</apiPackage>
+                <modelPackage>org.tkit.user.rs.proxy.models</modelPackage>
+                <generateSupportingFiles>false</generateSupportingFiles>
+                <apiInterfaceDoc>false</apiInterfaceDoc>
+                <fieldGen>LOMBOK</fieldGen>
+                <jsonLib>JACKSON</jsonLib>
+                <annotations>
+                    <annotation>javax.inject.Singleton</annotation>
+                    <annotation>org.tkit.quarkus.log.interceptor.LoggerService</annotation>
+                    <annotation>org.eclipse.microprofile.rest.client.inject.RegisterRestClient(configKey="my-client-key")</annotation>
+                </annotations>
+                <modelAnnotations>
+                    <modelAnnotation>lombok.ToString</modelAnnotation>
+                    <modelAnnotation>io.quarkus.runtime.annotations.RegisterForReflection</modelAnnotation>
+                </modelAnnotations>
+                <configOptions>
+                    <sourceFolder>user</sourceFolder>
+                </configOptions>
+            </configuration>
+        </execution>
+        <execution>
+            <id>user-proxy</id>
+            <goals>
+                <goal>codegen</goal>
+            </goals>
+            <configuration>
+                <inputSpec>src/main/resources/user/openapi.yaml</inputSpec>
+                <output>${project.build.directory}/generated-sources/endpoints</output>
+                <apiPackage>org.tkit.user.rs.proxy</apiPackage>
+                <modelPackage>org.tkit.user.rs.proxy.models</modelPackage>
+                <generateSupportingFiles>false</generateSupportingFiles>
+                <apiInterfaceDoc>false</apiInterfaceDoc>
+                <interfaceOnly>false</interfaceOnly>
+                <implType>PROXY</implType>
+                <fieldGen>LOMBOK</fieldGen>
+                <jsonLib>JACKSON</jsonLib>
+                <apiSuffix>RestController</apiSuffix>
+                <proxyClientClass>UsersRestClient</proxyClientClass>
+                <annotations>
+                    <annotation>javax.enterprise.context.ApplicationScoped</annotation>
+                </annotations>
+                <modelAnnotations>
+                    <modelAnnotation>lombok.ToString</modelAnnotation>
+                    <modelAnnotation>io.quarkus.runtime.annotations.RegisterForReflection</modelAnnotation>
+                </modelAnnotations>
+                <configOptions>
+                    <sourceFolder>user</sourceFolder>
+                </configOptions>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+
+## Parameters
 
 The plugin extends the parameter from: [Swagger maven plugin](https://github.com/swagger-api/swagger-codegen/tree/master/modules/swagger-codegen-maven-plugin)
 Extended parameters:
 
 |  Name | Default  | Values | Description  |
 |---|---|---|---|
+| modelPackage | | | The package name of the models |
+| apiPackage | | | The package name of the `RestClient` or `RestController` |
 | formatter | true | | The google source code formatter  |
 | apiName | | | The api name if this is set the generator will generate one file for all REST method |
 | interfaceOnly | true | | Generate the interface only. If you need to generate `RestController` set this attribute to `false` |
-| implType | CLASS | CLASS,INTERFACE | This attribute is use only for `interfaceOnly=false`. The default implementation `CLASS` will generate the class with `Response 501` for each method. The `INTERFACE` value will generate the interface with default method implementation `Response 501`  |
+| implType | CLASS | CLASS,INTERFACE,PROXY | This attribute is use only for `interfaceOnly=false`. The default implementation `CLASS` will generate the class with `Response 501` for each method. The `INTERFACE` value will generate the interface with default method implementation `Response 501`  |
 | pathPrefix | | | The path prefix for all interfaces. Example 'v2/' or '/'. REST method which starts not with this prefix will be ignored. |
 | apiSuffix | RestClient | | The api interface suffix |
 | annotations | | | The list of custom annotations for the interface. |
@@ -128,6 +200,11 @@ Extended parameters:
 | useBeanValidation | true | | Use the bean validation on the methods. |
 | apiInterfaceDoc | true | | Generate the micro-profile annotation on the generated interface. |
 | groupByTags | false | | Group the REST in the openAPI schema by tags (Default by swagger). Default is false to group the REST method by path |
+
+
+> The `implType=PROXY` will generate the proxy REST endpoint. For this implementation you need
+> to add the `proxyClientClass` which is the RestClient class and the `modelPackage` needs to have
+> the same value like the `RestClient`.
 
 ## Release
 
