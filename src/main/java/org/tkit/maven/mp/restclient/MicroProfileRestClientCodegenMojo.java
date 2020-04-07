@@ -369,6 +369,12 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
     private FieldGenerator fieldGen;
 
     /**
+     * The implementation type.
+     */
+    @Parameter(name = "implType", required = false, defaultValue = "CLASS")
+    private ImplType implType;
+
+    /**
      * Date library.
      */
     @Parameter(name = "dateLibrary", required = false, defaultValue = "java8")
@@ -598,6 +604,7 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.RETURN_RESPONSE, returnResponse);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.JSON_LIB, jsonLib);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.FIELD_GEN, fieldGen);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.IMPL_TYPE, implType);
         configurator.addAdditionalProperty(AbstractJavaCodegen.DATE_LIBRARY, dateLibrary);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.USE_BEAN_VALIDATION, useBeanValidation);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.API_INTERFACE_DOC, apiInterfaceDoc);

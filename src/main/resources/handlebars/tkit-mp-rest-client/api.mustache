@@ -28,13 +28,12 @@ import javax.validation.Valid;
 @Produces({ {{#produces}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/produces}} }){{/hasProduces}}
 {{#annotations}}@{{{.}}}
 {{/annotations}}
-{{>generatedAnnotation}}public interface {{classname}} {
+{{>generatedAnnotation}}public {{#implRestClass}}class{{/implRestClass}}{{^implRestClass}}interface{{/implRestClass}} {{classname}}  {
 {{#operations}}
 {{#operation}}
 {{#contents}}
 
-{{>apiInterface}}
-
+{{#interfaceOnly}}{{>apiInterface}}{{/interfaceOnly}}{{^interfaceOnly}}{{>apiMethod}}{{/interfaceOnly}}
 {{/contents}}
 {{/operation}}
 }

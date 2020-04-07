@@ -48,6 +48,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     /**
      * The key for field public.
      */
+    private static final String IMPL_REST_CLASS = "implRestClass";
+
+    /**
+     * The key for field public.
+     */
     private static final String FIELD_PUBLIC = "fieldPublic";
 
     /**
@@ -149,6 +154,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      * The key for api interface doc.
      */
     static final String FIELD_GEN = "fieldGen";
+
+    /**
+     * The implementation type.
+     */
+    static final String IMPL_TYPE = "implType";
 
     /**
      * The key for api interface doc.
@@ -283,8 +293,8 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         writePropertyBack(GENERATE_TO_STRING, false);
         writePropertyBack(GENERATE_GETTER_SETTER, false);
         if (additionalProperties.containsKey(FIELD_GEN)) {
-            FieldGenerator fieldgen = (FieldGenerator) additionalProperties.getOrDefault(FIELD_GEN, FieldGenerator.PUBLIC);
-            switch (fieldgen) {
+            FieldGenerator gen = (FieldGenerator) additionalProperties.getOrDefault(FIELD_GEN, FieldGenerator.PUBLIC);
+            switch (gen) {
                 case PUBLIC:
                     writePropertyBack(FIELD_PUBLIC, true);
                     break;
@@ -296,6 +306,25 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
                     writePropertyBack(GENERATE_TO_STRING, true);
                     writePropertyBack(GENERATE_GETTER_SETTER, true);
                     break;
+            }
+        }
+
+        updateBoolean(INTERFACE_ONLY, true);
+        boolean interfaceOnly = (Boolean) additionalProperties.get(INTERFACE_ONLY);
+        if (interfaceOnly) {
+            writePropertyBack(IMPL_REST_CLASS, false);
+        } else {
+            writePropertyBack(IMPL_REST_CLASS, true);
+            if (additionalProperties.containsKey(IMPL_TYPE)) {
+                ImplType impl = (ImplType) additionalProperties.getOrDefault(IMPL_TYPE, ImplType.CLASS);
+                switch (impl) {
+                    case CLASS:
+                        writePropertyBack(IMPL_REST_CLASS, true);
+                        break;
+                    case INTERFACE:
+                        writePropertyBack(IMPL_REST_CLASS, false);
+                        break;
+                }
             }
         }
 
@@ -316,7 +345,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         }
 
         updateBoolean(RETURN_RESPONSE, true);
-        updateBoolean(INTERFACE_ONLY, true);
+
 
         if (StringUtils.isBlank(templateDir)) {
             embeddedTemplateDir = templateDir = getTemplateDir();
