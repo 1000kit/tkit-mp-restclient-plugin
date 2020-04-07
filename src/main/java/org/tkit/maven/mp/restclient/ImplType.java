@@ -14,5 +14,10 @@ public enum ImplType {
      * The interface implementation with {@code default} method implementation.
      * Each method response HTTP 501.
      */
-    INTERFACE;
+    INTERFACE,
+
+    /**
+     * The proxy class implementation. Each method call rest client method.
+     */
+    PROXY;
 }

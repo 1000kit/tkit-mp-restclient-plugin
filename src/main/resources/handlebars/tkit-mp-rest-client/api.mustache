@@ -30,9 +30,15 @@ import javax.validation.Valid;
 {{/annotations}}
 {{>generatedAnnotation}}public {{#implRestClass}}class{{/implRestClass}}{{^implRestClass}}interface{{/implRestClass}} {{classname}}  {
 {{#operations}}
+
+    {{#implProxy}}
+        @javax.inject.Inject
+        @org.eclipse.microprofile.rest.client.inject.RestClient
+        {{proxyClientClass}} client;
+    {{/implProxy}}
+
 {{#operation}}
 {{#contents}}
-
 {{#interfaceOnly}}{{>apiInterface}}{{/interfaceOnly}}{{^interfaceOnly}}{{>apiMethod}}{{/interfaceOnly}}
 {{/contents}}
 {{/operation}}

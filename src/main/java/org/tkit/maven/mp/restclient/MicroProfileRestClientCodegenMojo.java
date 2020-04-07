@@ -392,6 +392,12 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
     @Parameter(name = "apiInterfaceDoc", required = false, defaultValue = "true")
     private Boolean apiInterfaceDoc;
 
+    /**
+     * Implementation proxy.
+     */
+    @Parameter(name = "proxyClientClass", required = false, defaultValue = "org.tkit.changeme.proxyClientClass")
+    private String proxyClientClass;
+
     @Override
     public void execute() throws MojoExecutionException {
 
@@ -605,6 +611,7 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.JSON_LIB, jsonLib);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.FIELD_GEN, fieldGen);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.IMPL_TYPE, implType);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.PROXY_CLIENT_CLASS, proxyClientClass);
         configurator.addAdditionalProperty(AbstractJavaCodegen.DATE_LIBRARY, dateLibrary);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.USE_BEAN_VALIDATION, useBeanValidation);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.API_INTERFACE_DOC, apiInterfaceDoc);

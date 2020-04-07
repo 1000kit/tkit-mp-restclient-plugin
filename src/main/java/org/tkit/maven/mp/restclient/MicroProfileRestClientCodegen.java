@@ -53,6 +53,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     /**
      * The key for field public.
      */
+    static final String IMPL_PROXY = "implProxy";
+
+    /**
+     * The key for field public.
+     */
     private static final String FIELD_PUBLIC = "fieldPublic";
 
     /**
@@ -109,6 +114,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      * The key for api interface doc.
      */
     static final String API_SUFFIX = "apiSuffix";
+
+    /**
+     * The key for api interface doc.
+     */
+    static final String PROXY_CLIENT_CLASS = "proxyClientClass";
 
     /**
      * The key for api interface doc.
@@ -255,8 +265,6 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     public void processOpts() {
         super.processOpts();
 
-//        importMapping.put("Schema", "org.eclipse.microprofile.openapi.annotations.media.Schema");
-
         writePropertyBack(USE_BEANVALIDATION, useBeanValidation);
 
         additionalProperties.put(HAS_ANNOTATIONS, updateCodegenExtraAnnotationList(ANNOTATIONS));
@@ -309,6 +317,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
             }
         }
 
+        boolean proxyImplementation = false;
         updateBoolean(INTERFACE_ONLY, true);
         boolean interfaceOnly = (Boolean) additionalProperties.get(INTERFACE_ONLY);
         if (interfaceOnly) {
@@ -323,6 +332,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
                         break;
                     case INTERFACE:
                         writePropertyBack(IMPL_REST_CLASS, false);
+                        break;
+                    case PROXY:
+                        writePropertyBack(IMPL_REST_CLASS, true);
+                        writePropertyBack(IMPL_PROXY, true);
+                        proxyImplementation = true;
                         break;
                 }
             }
@@ -358,6 +372,12 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         modelDocTemplateFiles.remove("model_doc.mustache");
         apiDocTemplateFiles.remove("api_doc.mustache");
         supportingFiles.clear();
+
+        // do not generate the models. We will use the models from the rest client
+        if (proxyImplementation) {
+            modelDocTemplateFiles.clear();
+            modelTemplateFiles.clear();
+        }
     }
 
     /**
