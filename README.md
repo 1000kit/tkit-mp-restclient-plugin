@@ -5,6 +5,8 @@ Tkit microprofile  rest client generator plugin
 [![License](https://img.shields.io/badge/license-Apache--2.0-green?style=for-the-badge&logo=apache)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Maven Central](https://img.shields.io/maven-central/v/org.tkit.maven/tkit-mp-restclient-plugin?logo=java&style=for-the-badge)](https://maven-badges.herokuapp.com/maven-central/org.tkit.maven/tkit-mp-restclient-plugin)
 
+> Version 0.8.0+ add support for `RestController` class and proxy implementation.
+
 > Version 0.7.0+ contains check for generated files. If the generator generated more files with the same
 > name the generator throws exception. The combination of the parameters `apiName`, `pathPrefix` or `groupByTags` is use to generate
 > corresponding java classes for the openAPI schema.
@@ -105,11 +107,15 @@ is default swagger generator but it could generated wrong java classes; depend o
 
 ## Goal: codegen - Proxy
 
+> The `implType=PROXY` will generate the proxy REST endpoint. For this implementation you need
+> to add the `proxyClientClass` which is the RestClient class and the `modelPackage` needs to have
+> the same value like the `RestClient`.
+
 ```java
 <plugin>
     <groupId>org.tkit.maven</groupId>
     <artifactId>tkit-mp-restclient-plugin</artifactId>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>0.8.0</version>
     <executions>
         <execution>
             <id>user-client</id>
@@ -200,11 +206,6 @@ Extended parameters:
 | useBeanValidation | true | | Use the bean validation on the methods. |
 | apiInterfaceDoc | true | | Generate the micro-profile annotation on the generated interface. |
 | groupByTags | false | | Group the REST in the openAPI schema by tags (Default by swagger). Default is false to group the REST method by path |
-
-
-> The `implType=PROXY` will generate the proxy REST endpoint. For this implementation you need
-> to add the `proxyClientClass` which is the RestClient class and the `modelPackage` needs to have
-> the same value like the `RestClient`.
 
 ## Release
 
