@@ -1,0 +1,46 @@
+package {{package}};
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
+
+@Slf4j
+public class DateTimeDeserializer extends StdDeserializer<OffsetDateTime> {
+    private static final long serialVersionUID = 1L;
+
+    public DateTimeDeserializer() {
+        this(null);
+    }
+
+    public DateTimeDeserializer(Class<?> vc) {
+        super(vc);
+    }
+
+    @Override
+    public OffsetDateTime deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+        JsonNode node = jp.getCodec().readTree(jp);
+
+        final String string = node.textValue();
+        try {
+            return OffsetDateTime.parse(string, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        } catch (Exception e) {
+            try {
+                LocalDateTime ldt = LocalDateTime.parse(string, DateTimeFormatter.ISO_DATE_TIME);
+                return OffsetDateTime.of(ldt, ZoneId.systemDefault().getRules().getOffset(ldt));
+            } catch (Exception ldpe) {
+                throw new JsonParseException(jsonparser, "Unparseable date-time: \"" + string + "\"", ldpe);
+            }
+        }
+    }
+}
+
