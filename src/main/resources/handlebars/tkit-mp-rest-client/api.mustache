@@ -23,7 +23,7 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 {{/useBeanValidation}}
 {{#operations}}{{#operation}}{{#isMultipart}}
-import java.io.File;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 {{/isMultipart}}{{/operation}}{{/operations}}
 
 @Path("/{{{baseName}}}"){{#hasConsumes}}

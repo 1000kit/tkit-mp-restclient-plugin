@@ -9,10 +9,9 @@
     @Consumes({ {{#consumes}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/consumes}} }){{/hasConsumes}}{{#hasProduces}}
     @Produces({ {{#produces}}"{{{mediaType}}}"{{#hasMore}}, {{/hasMore}}{{/produces}} }){{/hasProduces}}
 {{#implRestClass}}public{{/implRestClass}}{{^implRestClass}}default{{/implRestClass}} {{#returnResponse}}Response{{/returnResponse}}{{^returnResponse}}{{>returnTypeInterface}}{{/returnResponse}} {{nickname}}(
-{{^beanParam}}{{#parameters}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{#hasMore}},{{/hasMore}}{{/parameters}}{{/beanParam}}
+{{^beanParam}}{{#parameters}}{{#isMultipart}}MultipartFormDataInput input{{/isMultipart}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{^isMultipart}}{{>formParams}}{{/isMultipart}}{{#hasMore}},{{/hasMore}}{{/parameters}}{{/beanParam}}
 {{#beanParam}}@BeanParam {{beanParamName}} beanParam{{#bodyParams}}, {{>bodyParams}}{{/bodyParams}}{{/beanParam}}) {
-    {{#implProxy}}return Response.fromResponse(client.{{nickname}}(
-        {{^beanParam}}{{#parameters}}{{>proxyQueryParams}}{{>proxyPathParams}}{{>proxyHeaderParams}}{{>proxyBodyParams}}{{>proxyFormParams}}{{#hasMore}},{{/hasMore}}{{/parameters}}{{/beanParam}}
+    {{#implProxy}}return Response.fromResponse(client.{{nickname}}({{^beanParam}}{{#parameters}}{{>proxyQueryParams}}{{>proxyPathParams}}{{>proxyHeaderParams}}{{>proxyBodyParams}}{{#isMultipart}}input{{/isMultipart}}{{^isMultipart}}{{>proxyFormParams}}{{/isMultipart}}{{#hasMore}},{{/hasMore}}{{/parameters}}{{/beanParam}}
         {{#beanParam}}{{beanParamName}} beanParam{{#bodyParams}}, {{>proxyBodyParams}}{{/bodyParams}}{{/beanParam}})).build();
     {{/implProxy}}
     {{^implProxy}}return Response.status(501).build();{{/implProxy}}

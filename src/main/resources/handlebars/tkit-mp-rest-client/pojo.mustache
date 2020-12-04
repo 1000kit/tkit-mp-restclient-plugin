@@ -9,6 +9,13 @@ import com.fasterxml.jackson.annotation.JsonValue;{{/jackson}}
 import javax.json.bind.annotation.JsonbProperty;
 {{/jsonb}}
 
+/* pojo context
+{{#each this}}
+ Key: {{@key}} Value = {{this}}
+{{/each}}
+
+*/
+
 {{#description}}
 /**
  * {{description}}
