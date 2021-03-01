@@ -16,11 +16,17 @@
 package org.tkit.maven.mp.restclient;
 
 import com.google.googlejavaformat.java.Formatter;
-import io.swagger.codegen.v3.*;
+import io.swagger.codegen.v3.CliOption;
+import io.swagger.codegen.v3.CodegenConstants;
+import io.swagger.codegen.v3.CodegenModel;
+import io.swagger.codegen.v3.CodegenOperation;
+import io.swagger.codegen.v3.CodegenProperty;
+import io.swagger.codegen.v3.VendorExtendable;
 import io.swagger.codegen.v3.generators.java.AbstractJavaJAXRSServerCodegen;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,9 +36,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * The micro-profile client code generator.
@@ -220,6 +230,10 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      */
     private int beanParamCount = 4;
 
+    private Map<String, CodegenModel> codegenModelMap = new HashMap<>();
+
+    private final String COMPLEX_QUERY_PARAM_KEY = "complex-query-param";
+
     /**
      * The default constructor.
      */
@@ -396,6 +410,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         return "Micro-profile rest client generator according to JAXRS 2.0 specification.";
     }
 
+    @Override
+    public String customTemplateDir() {
+        return getDefaultTemplateDir();
+    }
+
     /**
      * {@inheritDoc }
      */
@@ -406,7 +425,8 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
 
     /**
      * Updates the boolean parameter value.
-     * @param name the name of the parameter.
+     *
+     * @param name  the name of the parameter.
      * @param value the default value.
      * @return the value or default value of the parameter.
      */
@@ -534,6 +554,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         return super.shouldOverwrite(filename);
     }
 
+    @Override
+    public boolean checkAliasModel() {
+        return false;
+    }
+
     /**
      * {@inheritDoc }
      */
@@ -562,6 +587,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
 
     /**
      * Update the codegen extra annotation list.
+     *
      * @param name the class name.
      * @return returns {@code true} if there is extra annotations list.
      */
@@ -603,5 +629,45 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         model.imports.remove("JsonProperty");
         model.imports.remove("Data");
         model.imports.remove("ToString");
+
+        checkIfComplexQueryParam(model);
+    }
+
+    private void checkIfComplexQueryParam(CodegenModel model) {
+        openAPI.getPaths().forEach((key, value) -> {
+            Set<Parameter> parameters = getAllOperationParameters(value);
+            parameters.forEach(markAsComplexQueryParam(model));
+        });
+    }
+
+    private Consumer<Parameter> markAsComplexQueryParam(CodegenModel model) {
+        return param -> {
+            if (model.getClassname().equals(param.getName()) && !model.getIsPrimitiveType() && param.getIn().equals("query")) {
+                model.getVendorExtensions().put(VendorExtendable.PREFIX_IS + COMPLEX_QUERY_PARAM_KEY, true);
+            }
+        };
+    }
+
+    private Set<Parameter> getAllOperationParameters(io.swagger.v3.oas.models.PathItem value) {
+        Set<Parameter> parameters = new HashSet<>();
+        if (value.getGet() != null && value.getGet().getParameters() != null)
+            parameters.addAll(value.getGet().getParameters());
+        if (value.getPut() != null && value.getPut().getParameters() != null)
+            parameters.addAll(value.getPut().getParameters());
+        if (value.getPost() != null && value.getPost().getParameters() != null)
+            parameters.addAll(value.getPost().getParameters());
+        if (value.getDelete() != null && value.getDelete().getParameters() != null)
+            parameters.addAll(value.getDelete().getParameters());
+        if (value.getOptions() != null && value.getOptions().getParameters() != null)
+            parameters.addAll(value.getOptions().getParameters());
+        if (value.getHead() != null && value.getHead().getParameters() != null)
+            parameters.addAll(value.getHead().getParameters());
+        if (value.getPatch() != null && value.getPatch().getParameters() != null)
+            parameters.addAll(value.getPatch().getParameters());
+        if (value.getTrace() != null && value.getTrace().getParameters() != null)
+            parameters.addAll(value.getTrace().getParameters());
+        if (value.getParameters() != null && value.getParameters() != null)
+            parameters.addAll(value.getParameters());
+        return parameters;
     }
 }
