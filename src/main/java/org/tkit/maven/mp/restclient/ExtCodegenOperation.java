@@ -23,6 +23,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The extends code generation for the operation.
@@ -46,6 +47,12 @@ public class ExtCodegenOperation extends CodegenOperation {
      */
     @Getter @Setter
     public String beanParamName;
+
+    /**
+     * The complex query params list.
+     */
+    @Getter @Setter
+    public List<CodegenParameter> complexQueryParams;
 
     /**
      * The default constructor.
@@ -95,11 +102,18 @@ public class ExtCodegenOperation extends CodegenOperation {
         vendorExtensions = op.vendorExtensions;
 
         beanParams = new ArrayList<>();
+        complexQueryParams = new ArrayList<>();
         if (pathParams != null) {
             beanParams.addAll(pathParams);
         }
         if (queryParams != null) {
             beanParams.addAll(queryParams);
+
+            complexQueryParams = queryParams.stream()
+                    .filter(queryParams -> !queryParams.getIsPrimitiveType())
+                    .collect(Collectors.toList());
+
+            queryParams.removeAll(complexQueryParams);
         }
         if (headerParams != null) {
             beanParams.addAll(headerParams);

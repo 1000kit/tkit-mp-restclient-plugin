@@ -2,6 +2,7 @@
 {{#lombokData}}@Data{{/lombokData}}
 public class {{beanParamName}} {
 
+{{#complexQueryParams}}{{>complexQueryParams}};{{/complexQueryParams}}
 {{#queryParams}}{{>queryParams}};{{/queryParams}}
 {{#headerParams}}{{>headerParams}};{{/headerParams}}
 {{#pathParams}}{{>pathParams}};{{/pathParams}}
