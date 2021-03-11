@@ -1,1 +1,1 @@
-{{#is this 'query-param'}}{{#isNot this 'primitive-type'}}{{#useBeanValidation}}{{>beanValidationQueryParams}} {{/useBeanValidation}}@BeanParam {{{dataType}}} {{paramName}}{{/isNot}}{{/is}}
+{{#vendorExtensions.x-is-complex-query-param}}{{#is this 'query-param'}}{{#useBeanValidation}}{{>beanValidationQueryParams}} {{/useBeanValidation}}@BeanParam {{{dataType}}} {{paramName}}{{/is}}{{/vendorExtensions.x-is-complex-query-param}}

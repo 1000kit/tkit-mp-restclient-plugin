@@ -146,7 +146,8 @@ public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}} {{#seriali
         {{^generateGetterSetter}}
             {{#jackson}}@JsonProperty(value="{{baseName}}", required={{required}}){{/jackson}}{{#jsonb}}@JsonbProperty("{{baseName}}"){{/jsonb}}
         {{/generateGetterSetter}}
-        {{#useBeanValidation}}{{>beanValidationQueryParams}} {{/useBeanValidation}}@QueryParam("{{baseName}}"){{#defaultValue}} @DefaultValue("{{{defaultValue}}}") {{/defaultValue}}
+        {{^vendorExtensions.x-is-complex-query-param}}{{#useBeanValidation}}{{>beanValidationQueryParams}} {{/useBeanValidation}}@QueryParam("{{baseName}}"){{#defaultValue}} @DefaultValue("{{{defaultValue}}}") {{/defaultValue}}{{/vendorExtensions.x-is-complex-query-param}}
+        {{#vendorExtensions.x-is-complex-query-param}}@BeanParam{{/vendorExtensions.x-is-complex-query-param}}
         {{#fieldPublic}}public{{/fieldPublic}}{{^fieldPublic}}private{{/fieldPublic}} {{#useBeanValidation}}@Valid{{/useBeanValidation}} {{{datatypeWithEnum}}} {{name}} = {{{defaultValue}}};
     {{/vars}}
 
@@ -172,7 +173,8 @@ public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}} {{#seriali
             {{#vendorExtensions.extraAnnotation}}{{{vendorExtensions.extraAnnotation}}}{{/vendorExtensions.extraAnnotation}}
 
             {{#jackson}}@JsonProperty("{{baseName}}"){{/jackson}}{{#jsonb}}@JsonbProperty("{{baseName}}"){{/jsonb}}
-            {{#useBeanValidation}}{{>beanValidationQueryParams}} {{/useBeanValidation}}@QueryParam("{{baseName}}"){{#defaultValue}} @DefaultValue("{{{defaultValue}}}") {{/defaultValue}}
+            {{^vendorExtensions.x-is-complex-query-param}}{{#useBeanValidation}}{{>beanValidationQueryParams}} {{/useBeanValidation}}@QueryParam("{{baseName}}"){{#defaultValue}} @DefaultValue("{{{defaultValue}}}") {{/defaultValue}}{{/vendorExtensions.x-is-complex-query-param}}
+            {{#vendorExtensions.x-is-complex-query-param}}@BeanParam{{/vendorExtensions.x-is-complex-query-param}}
             public {{{datatypeWithEnum}}} {{#isBoolean}}is{{/isBoolean}}{{getter}}() {
             return {{name}};
             }

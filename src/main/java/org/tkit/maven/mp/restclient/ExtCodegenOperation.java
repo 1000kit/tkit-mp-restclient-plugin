@@ -16,13 +16,16 @@
 package org.tkit.maven.mp.restclient;
 
 
+import io.swagger.codegen.v3.CodegenModel;
 import io.swagger.codegen.v3.CodegenOperation;
 import io.swagger.codegen.v3.CodegenParameter;
+import io.swagger.codegen.v3.VendorExtendable;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -54,11 +57,13 @@ public class ExtCodegenOperation extends CodegenOperation {
     @Getter @Setter
     public List<CodegenParameter> complexQueryParams;
 
+    private final String COMPLEX_QUERY_PARAM_KEY = "complex-query-param";
+
     /**
      * The default constructor.
      * @param op the original code gen operation.
      */
-    public ExtCodegenOperation(CodegenOperation op) {
+    public ExtCodegenOperation(CodegenOperation op, Map<String, CodegenModel> codegenModelMap) {
         responseHeaders.addAll(op.responseHeaders);
         returnTypeIsPrimitive = op.returnTypeIsPrimitive;
         returnSimpleType = op.returnSimpleType;
@@ -110,8 +115,11 @@ public class ExtCodegenOperation extends CodegenOperation {
             beanParams.addAll(queryParams);
 
             complexQueryParams = queryParams.stream()
-                    .filter(queryParams -> !queryParams.getIsPrimitiveType())
+                    .filter(queryParam -> isQueryParamAComplexModel(codegenModelMap, queryParam))
                     .collect(Collectors.toList());
+
+            complexQueryParams.forEach(this::markAsComplexQueryParam);
+            allParams.forEach(this::markIfComplexQueryParam);
 
             queryParams.removeAll(complexQueryParams);
         }
@@ -121,7 +129,30 @@ public class ExtCodegenOperation extends CodegenOperation {
         if (formParams != null) {
             beanParams.addAll(formParams);
         }
-
     }
 
+    private void markAsComplexQueryParam(CodegenParameter param) {
+        param.getVendorExtensions().put(VendorExtendable.PREFIX_IS + COMPLEX_QUERY_PARAM_KEY, true);
+    }
+
+    private void markIfComplexQueryParam(CodegenParameter param) {
+        boolean isComplex = complexQueryParams.stream()
+                .anyMatch(complexQueryParam -> isEquals(param, complexQueryParam));
+        if (isComplex) {
+            markAsComplexQueryParam(param);
+        }
+    }
+
+    private boolean isQueryParamAComplexModel(Map<String, CodegenModel> codegenModelMap, CodegenParameter param) {
+        if (codegenModelMap.containsKey(param.getDataType())) {
+            CodegenModel codegenModel = codegenModelMap.get(param.getDataType());
+            return codegenModel.getBooleanValue(VendorExtendable.PREFIX_IS + COMPLEX_QUERY_PARAM_KEY);
+        }
+        return false;
+    }
+
+    private boolean isEquals(CodegenParameter param, CodegenParameter complexQueryParam) {
+        return complexQueryParam.getParamName().equals(param.getParamName())
+                && complexQueryParam.getIsQueryParam().equals(param.getIsQueryParam());
+    }
 }
