@@ -19,12 +19,15 @@ import com.google.googlejavaformat.java.Formatter;
 import io.swagger.codegen.v3.CliOption;
 import io.swagger.codegen.v3.CodegenConstants;
 import io.swagger.codegen.v3.CodegenModel;
+import io.swagger.codegen.v3.CodegenObject;
 import io.swagger.codegen.v3.CodegenOperation;
+import io.swagger.codegen.v3.CodegenParameter;
 import io.swagger.codegen.v3.CodegenProperty;
 import io.swagger.codegen.v3.VendorExtendable;
 import io.swagger.codegen.v3.generators.java.AbstractJavaJAXRSServerCodegen;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * The micro-profile client code generator.
@@ -608,12 +612,37 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     @Override
     public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, Map<String, Schema> schemas, OpenAPI openAPI) {
         CodegenOperation op = super.fromOperation(path, httpMethod, operation, schemas, openAPI);
-        ExtCodegenOperation e = new ExtCodegenOperation(op);
+        ExtCodegenOperation e = new ExtCodegenOperation(op, codegenModelMap);
         e.setBeanParamName(camelize(op.operationId) + beanParamSuffix);
         if (e.beanParams.size() >= beanParamCount) {
             e.setBeanParam(true);
         }
         return e;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public Map<String, Object> postProcessAllModels(Map<String, Object> processedModels) {
+        Map<String, CodegenModel> modelMap = new HashMap<>();
+
+        processedModels.forEach((key, value) -> {
+            Map<String, Object> valueMap = (Map<String, Object>) value;
+            List<Map<String, Object>> modelsMap = (List<Map<String, Object>>) valueMap.get("models");
+
+            modelMap.putAll(modelsMap
+                    .stream()
+                    .collect(Collectors.toMap(
+                            map -> ((CodegenModel) map.get("model")).getName(),
+                            map -> (CodegenModel) map.get("model")
+                    )));
+        });
+
+        modelMap.forEach((key, value) -> markComplexQueryParams(value, modelMap));
+
+        codegenModelMap.putAll(modelMap);
+        return super.postProcessAllModels(processedModels);
     }
 
     /**
@@ -629,23 +658,57 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         model.imports.remove("JsonProperty");
         model.imports.remove("Data");
         model.imports.remove("ToString");
-
-        checkIfComplexQueryParam(model);
     }
 
-    private void checkIfComplexQueryParam(CodegenModel model) {
-        openAPI.getPaths().forEach((key, value) -> {
-            Set<Parameter> parameters = getAllOperationParameters(value);
-            parameters.forEach(markAsComplexQueryParam(model));
-        });
+    private void markComplexQueryParams(CodegenModel model, Map<String, CodegenModel> modelMap) {
+        for (Map.Entry<String, PathItem> entry : openAPI.getPaths().entrySet()) {
+            PathItem pathItem = entry.getValue();
+            Set<Parameter> parameters = getAllOperationParameters(pathItem);
+            parameters.forEach(markIfComplexQueryParam(model, modelMap));
+        }
     }
 
-    private Consumer<Parameter> markAsComplexQueryParam(CodegenModel model) {
+    private Consumer<Parameter> markIfComplexQueryParam(CodegenModel model, Map<String, CodegenModel> modelMap) {
         return param -> {
-            if (model.getClassname().equals(param.getName()) && !model.getIsPrimitiveType() && param.getIn().equals("query")) {
-                model.getVendorExtensions().put(VendorExtendable.PREFIX_IS + COMPLEX_QUERY_PARAM_KEY, true);
+            if (isComplexQueryParam(model, param)) {
+                markAsComplexQueryParam(model);
+                markChildrenIfComplexQueryParam(model, modelMap);
             }
         };
+    }
+
+    private void markAsComplexQueryParam(CodegenObject codegenObject) {
+        codegenObject.getVendorExtensions().put(VendorExtendable.PREFIX_IS + COMPLEX_QUERY_PARAM_KEY, true);
+    }
+
+    private void markChildrenIfComplexQueryParam(CodegenModel model, Map<String, CodegenModel> modelMap) {
+        if (model.getHasVars() && !model.getVars().isEmpty()) {
+            model.getVars().forEach(codegenProperty -> {
+                if (modelMap.containsKey(codegenProperty.getBaseType())) {
+                    CodegenModel codegenModel = modelMap.get(codegenProperty.getBaseType());
+                    if (isCodegenModelAnObject(codegenModel)) {
+                        markAsComplexQueryParam(codegenProperty);
+                        markAsComplexQueryParam(codegenModel);
+                        markChildrenIfComplexQueryParam(codegenModel, modelMap);
+                    }
+                }
+            });
+        }
+    }
+
+    private boolean isComplexQueryParam(CodegenModel model, Parameter param) {
+        CodegenParameter codegenParameter = fromParameter(param, new HashSet<>());
+        return model.getClassname().equals(codegenParameter.getDataType())
+                && isCodegenModelAnObject(model)
+                && param.getIn().equals("query");
+    }
+
+    private boolean isCodegenModelAnObject(CodegenModel model) {
+        return !model.getIsPrimitiveType()
+                && !model.getIsEnum()
+                && !model.getIsArrayModel()
+                && !model.getIsListContainer()
+                && !model.getIsMapContainer();
     }
 
     private Set<Parameter> getAllOperationParameters(io.swagger.v3.oas.models.PathItem value) {
