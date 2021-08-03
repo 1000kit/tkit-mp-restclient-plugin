@@ -42,7 +42,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}} {{#seriali
   {{^generateGetterSetter}}
   {{#jackson}}@JsonProperty(value="{{baseName}}", required={{required}}){{/jackson}}{{#jsonb}}@JsonbProperty("{{baseName}}"){{/jsonb}}
   {{/generateGetterSetter}}
-  {{#fieldPublic}}public{{/fieldPublic}}{{^fieldPublic}}private{{/fieldPublic}} {{#useBeanValidation}}@Valid{{/useBeanValidation}} {{{datatypeWithEnum}}} {{name}} = {{{defaultValue}}};
+  {{#fieldPublic}}public{{/fieldPublic}}{{^fieldPublic}}private{{/fieldPublic}} {{#useBeanValidation}}@Valid{{#required}} @NotNull {{/required}}{{/useBeanValidation}} {{{datatypeWithEnum}}} {{name}} = {{{defaultValue}}};
   {{/vars}}
 
   {{#generateGetterSetter}}
