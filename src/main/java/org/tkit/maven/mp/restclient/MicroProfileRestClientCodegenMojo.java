@@ -638,7 +638,7 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
             return;
         }
         try {
-            new DefaultGenerator().opts(input).generate();
+            new MicroProfileGenerator().opts(input).generate();
         } catch (Exception e) {
             // Maven logs exceptions thrown by plugins only if invoked with -e
             // I find it annoying to jump through hoops to get basic diagnostic information,

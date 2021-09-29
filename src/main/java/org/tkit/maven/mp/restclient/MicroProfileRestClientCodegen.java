@@ -455,6 +455,9 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         if (computed.length() == 0) {
             return "Default" + apiSuffix;
         }
+        if (groupByTags) {
+            computed = computed.replace("internal", "");
+        }
         computed = sanitizeName(computed);
         return camelize(computed) + apiSuffix;
     }
@@ -467,6 +470,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         // groups REST services by tag
         if (groupByTags) {
             super.addOperationToGroup(tag, resourcePath, operation, co, operations);
+            co.subresourceOperation = !co.path.isEmpty();
             return;
         }
 
