@@ -195,6 +195,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     static final String API_INTERFACE_DOC = "apiInterfaceDoc";
 
     /**
+     * The key for apiPathFromBasePath option
+     */
+    static final String BAS_PATH_PREFIX = "basePathPrefix";
+
+    /**
      * The list of generated files.
      */
     private List<String> outputFiles = new ArrayList<>();
@@ -483,6 +488,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
 
         // group all REST services in the schema to `/` to one file
         if ((apiName != null && !apiName.isEmpty() && (pathPrefix == null || pathPrefix.isEmpty())) || "/".equals(pathPrefix)) {
+
             co.baseName = "";
             co.path = restPath;
             co.subresourceOperation = !co.path.isEmpty();
