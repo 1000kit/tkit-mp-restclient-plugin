@@ -210,6 +210,7 @@ Extended parameters:
 | useBeanValidation | true | | Use the bean validation on the methods. |
 | apiInterfaceDoc | true | | Generate the micro-profile annotation on the generated interface. |
 | groupByTags | false | | Group the REST in the openAPI schema by tags (Default by swagger). Default is false to group the REST method by path |
+| basePathPrefix | | | Add in the case basePath defined in swagger contains additional part which is not included in context root. Example `basePath=/ms-rs/v2/` then add `v2/` |
 
 ## Release
 

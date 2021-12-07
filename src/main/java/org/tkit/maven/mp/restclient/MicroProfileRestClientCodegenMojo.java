@@ -398,6 +398,12 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
     @Parameter(name = "proxyClientClass", required = false, defaultValue = "org.tkit.changeme.proxyClientClass")
     private String proxyClientClass;
 
+    /**
+     * additional path suffix specified in basePath which is not included in context root
+     */
+    @Parameter(name = "basePathPrefix", required = false)
+    private String basePathPrefix;
+
     @Override
     public void execute() throws MojoExecutionException {
 
@@ -615,6 +621,7 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
         configurator.addAdditionalProperty(AbstractJavaCodegen.DATE_LIBRARY, dateLibrary);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.USE_BEAN_VALIDATION, useBeanValidation);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.API_INTERFACE_DOC, apiInterfaceDoc);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.BAS_PATH_PREFIX, basePathPrefix);
 
 
         final ClientOptInput input = configurator.toClientOptInput();
