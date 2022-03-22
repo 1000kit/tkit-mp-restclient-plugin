@@ -21,14 +21,19 @@ package org.tkit.maven.mp.restclient;
 public enum FieldGenerator {
 
     /**
-     * Generated setter and getter.
+     * Generated setter and getter, toString and equals
      */
     GET_SET,
 
     /**
-     * Use the lombok annotation for pojo class.
+     * Use the lombok @Data annotation for pojo class.
      */
     LOMBOK,
+
+    /**
+     * Use the lombok @Getter and @Setter annotation for pojo class.
+     */
+    LOMBOK_GET_SET,
 
     /**
      * Mark all fields as public.

@@ -1,7 +1,11 @@
 import java.util.Objects;
 {{#lombokData}}
-import lombok.Data;
+    import lombok.Data;
 {{/lombokData}}
+{{#lombokGetSet}}
+import lombok.Getter;
+import lombok.Setter;
+{{/lombokGetSet}}
 {{#jackson}}
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;{{/jackson}}
@@ -19,6 +23,10 @@ import javax.ws.rs.*;
 {{#discriminator}}{{>typeInfoAnnotation}}{{/discriminator}}
 {{#description}}{{/description}}
 {{#lombokData}}@Data{{/lombokData}}
+{{#lombokGetSet}}
+@Getter
+@Setter
+{{/lombokGetSet}}
 {{#modelAnnotations}}@{{{.}}}
 {{/modelAnnotations}}
 public class {{classname}} {{#parent}}extends {{{parent}}}{{/parent}} {{#serializableModel}}implements Serializable{{/serializableModel}} {

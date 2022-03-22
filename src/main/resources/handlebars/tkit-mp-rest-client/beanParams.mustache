@@ -1,5 +1,8 @@
-
 {{#lombokData}}@Data{{/lombokData}}
+{{#lombokGetSet}}
+    @Getter
+    @Setter
+{{/lombokGetSet}}
 public class {{beanParamName}} {
 
 {{#complexQueryParams}}{{>complexQueryParams}};{{/complexQueryParams}}
