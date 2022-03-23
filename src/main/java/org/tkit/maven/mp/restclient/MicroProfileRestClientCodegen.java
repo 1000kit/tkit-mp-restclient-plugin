@@ -58,6 +58,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
      * The key for lombok data.
      */
     private static final String LOMBOK_DATA = "lombokData";
+    private static final String LOMBOK_GET_SET = "lombokGetSet";
 
     /**
      * The key for field public.
@@ -331,6 +332,9 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
                     break;
                 case LOMBOK:
                     writePropertyBack(LOMBOK_DATA, true);
+                    break;
+                case LOMBOK_GET_SET:
+                    writePropertyBack(LOMBOK_GET_SET, true);
                     break;
                 case GET_SET:
                     writePropertyBack(GENERATE_EQUALS, true);
