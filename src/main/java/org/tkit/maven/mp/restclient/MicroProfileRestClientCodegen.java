@@ -25,6 +25,7 @@ import io.swagger.codegen.v3.CodegenParameter;
 import io.swagger.codegen.v3.CodegenProperty;
 import io.swagger.codegen.v3.VendorExtendable;
 import io.swagger.codegen.v3.generators.java.AbstractJavaJAXRSServerCodegen;
+import io.swagger.codegen.v3.utils.ModelUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -201,6 +202,11 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     static final String BAS_PATH_PREFIX = "basePathPrefix";
 
     /**
+     * Preserve enum case names. If false enum names are always uppercase and common prefix names are removed
+     */
+    static final String PRESERVE_ENUM_CASE  = "preserveEnumCase";
+
+    /**
      * The list of generated files.
      */
     private List<String> outputFiles = new ArrayList<>();
@@ -264,6 +270,7 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
         additionalProperties.put(GENERATE_GETTER_SETTER, false);
         additionalProperties.put(API_SUFFIX, apiSuffix);
         additionalProperties.put(RETURN_RESPONSE, true);
+        additionalProperties.put(PRESERVE_ENUM_CASE, false);
 
         for (int i = 0; i < cliOptions.size(); i++) {
             if (CodegenConstants.LIBRARY.equals(cliOptions.get(i).getOpt())) {
@@ -657,6 +664,34 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
 
         codegenModelMap.putAll(modelMap);
         return super.postProcessAllModels(processedModels);
+    }
+
+    @Override
+    public String toEnumVarName(String value, String datatype) {
+        boolean preserveEnumCase = (Boolean) additionalProperties.get(PRESERVE_ENUM_CASE);
+        if (!preserveEnumCase) {
+            return super.toEnumVarName(value, datatype);
+        }
+        //Enum case sensitive names as defined (no uppercase)
+        if (value.length() == 0) {
+            return "EMPTY";
+        }
+        String var = value.replaceAll("\\W+", "_");
+        if (var.matches("\\d.*")) {
+            return "_" + var;
+        } else {
+            return var;
+        }
+    }
+
+    @Override
+    public String findCommonPrefixOfVars(List<Object> vars) {
+        boolean preserveEnumCase = (Boolean) additionalProperties.get(PRESERVE_ENUM_CASE);
+        if (!preserveEnumCase) {
+            return super.findCommonPrefixOfVars(vars);
+        }
+        //Avoid stripping out common prefix for enum names
+        return "";
     }
 
     /**
