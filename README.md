@@ -4,6 +4,10 @@ Tkit microprofile  rest client generator plugin
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-green?style=for-the-badge&logo=apache)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Maven Central](https://img.shields.io/maven-central/v/org.tkit.maven/tkit-mp-restclient-plugin?logo=java&style=for-the-badge)](https://maven-badges.herokuapp.com/maven-central/org.tkit.maven/tkit-mp-restclient-plugin)
+> Version 0.15.0 new configuration preserveEnumCase. By default false, if set to true:
+  - Generated enum names are case-sensitive, not forced uppercase anymore
+  - Common prefix enum name removal is disabled https://github.com/swagger-api/swagger-codegen/issues/5932
+
 > Version 0.14.0 fieldGen LOMBOK_GET_SET for @Getter@/Setter annotation only
 
 > Version 0.12.0+ fix groupByTags feature
@@ -189,29 +193,30 @@ is default swagger generator but it could generated wrong java classes; depend o
 The plugin extends the parameter from: [Swagger maven plugin](https://github.com/swagger-api/swagger-codegen/tree/master/modules/swagger-codegen-maven-plugin)
 Extended parameters:
 
-|  Name | Default  | Values | Description  |
-|---|---|---|---|
-| modelPackage | | | The package name of the models |
-| apiPackage | | | The package name of the `RestClient` or `RestController` |
-| formatter | true | | The google source code formatter  |
-| apiName | | | The api name if this is set the generator will generate one file for all REST method |
-| interfaceOnly | true | | Generate the interface only. If you need to generate `RestController` set this attribute to `false` |
-| implType | CLASS | CLASS,INTERFACE,PROXY | This attribute is use only for `interfaceOnly=false`. The default implementation `CLASS` will generate the class with `Response 501` for each method. The `INTERFACE` value will generate the interface with default method implementation `Response 501`  |
-| pathPrefix | | | The path prefix for all interfaces. Example 'v2/' or '/'. REST method which starts not with this prefix will be ignored. |
-| apiSuffix | RestClient | | The api interface suffix |
-| annotations | | | The list of custom annotations for the interface. |
-| modelAnnotations | | | The list of custom annotations for the model. |
-| restClient | true | | The flag to generate the micro-profile rest client for the interface. |
-| returnResponse | true | | The return type will be the Response. |
-| beanParamSuffix | BeanParam | | The bean parameter suffix. |
-| beanParamCount | 9 | | The number of the parameters to group by the bean parameter. |
-| jsonLib | JSONB | JACKSON,JSONB | The JSON implementation. |
-| fieldGen | PUBLIC | LOMBOK,GET_SET,PUBLIC | The model field generator type. |
-| dateLibrary | java8 | | The date library. |
-| useBeanValidation | true | | Use the bean validation on the methods. |
-| apiInterfaceDoc | true | | Generate the micro-profile annotation on the generated interface. |
-| groupByTags | false | | Group the REST in the openAPI schema by tags (Default by swagger). Default is false to group the REST method by path |
-| basePathPrefix | | | Add in the case basePath defined in swagger contains additional part which is not included in context root. Example `basePath=/ms-rs/v2/` then add `v2/` |
+|  Name | Default    | Values | Description                                                                                                                                                                                                                                               |
+|---|------------|---|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| modelPackage |            | | The package name of the models                                                                                                                                                                                                                            |
+| apiPackage |            | | The package name of the `RestClient` or `RestController`                                                                                                                                                                                                  |
+| formatter | true       | | The google source code formatter                                                                                                                                                                                                                          |
+| apiName |            | | The api name if this is set the generator will generate one file for all REST method                                                                                                                                                                      |
+| interfaceOnly | true       | | Generate the interface only. If you need to generate `RestController` set this attribute to `false`                                                                                                                                                       |
+| implType | CLASS      | CLASS,INTERFACE,PROXY | This attribute is use only for `interfaceOnly=false`. The default implementation `CLASS` will generate the class with `Response 501` for each method. The `INTERFACE` value will generate the interface with default method implementation `Response 501` |
+| pathPrefix |            | | The path prefix for all interfaces. Example 'v2/' or '/'. REST method which starts not with this prefix will be ignored.                                                                                                                                  |
+| apiSuffix | RestClient | | The api interface suffix                                                                                                                                                                                                                                  |
+| annotations |            | | The list of custom annotations for the interface.                                                                                                                                                                                                         |
+| modelAnnotations |            | | The list of custom annotations for the model.                                                                                                                                                                                                             |
+| restClient | true       | | The flag to generate the micro-profile rest client for the interface.                                                                                                                                                                                     |
+| returnResponse | true       | | The return type will be the Response.                                                                                                                                                                                                                     |
+| beanParamSuffix | BeanParam  | | The bean parameter suffix.                                                                                                                                                                                                                                |
+| beanParamCount | 9          | | The number of the parameters to group by the bean parameter.                                                                                                                                                                                              |
+| jsonLib | JSONB      | JACKSON,JSONB | The JSON implementation.                                                                                                                                                                                                                                  |
+| fieldGen | PUBLIC     | LOMBOK,GET_SET,PUBLIC | The model field generator type.                                                                                                                                                                                                                           |
+| dateLibrary | java8      | | The date library.                                                                                                                                                                                                                                         |
+| useBeanValidation | true       | | Use the bean validation on the methods.                                                                                                                                                                                                                   |
+| apiInterfaceDoc | true       | | Generate the micro-profile annotation on the generated interface.                                                                                                                                                                                         |
+| groupByTags | false      | | Group the REST in the openAPI schema by tags (Default by swagger). Default is false to group the REST method by path                                                                                                                                      |
+| basePathPrefix |            | | Add in the case basePath defined in swagger contains additional part which is not included in context root. Example `basePath=/ms-rs/v2/` then add `v2/`                                                                                                  |
+| preserveEnumCase | false      | | Preserve enum case names. If false (default) enum names are always uppercase and common prefix names are removed.                                                                                                                                         |
 
 ## Release
 

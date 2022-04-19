@@ -404,6 +404,12 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
     @Parameter(name = "basePathPrefix", required = false)
     private String basePathPrefix;
 
+    /**
+     * Preserve enum case names. If false enum names are always uppercase and common prefix names are removed
+     */
+    @Parameter(name = "preserveEnumCase", required = false, defaultValue = "false")
+    private Boolean preserveEnumCase;
+
     @Override
     public void execute() throws MojoExecutionException {
 
@@ -622,6 +628,7 @@ public class MicroProfileRestClientCodegenMojo extends AbstractMojo {
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.USE_BEAN_VALIDATION, useBeanValidation);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.API_INTERFACE_DOC, apiInterfaceDoc);
         configurator.addAdditionalProperty(MicroProfileRestClientCodegen.BAS_PATH_PREFIX, basePathPrefix);
+        configurator.addAdditionalProperty(MicroProfileRestClientCodegen.PRESERVE_ENUM_CASE, preserveEnumCase);
 
 
         final ClientOptInput input = configurator.toClientOptInput();
