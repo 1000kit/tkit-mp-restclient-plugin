@@ -4,6 +4,8 @@ Tkit microprofile  rest client generator plugin
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-green?style=for-the-badge&logo=apache)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Maven Central](https://img.shields.io/maven-central/v/org.tkit.maven/tkit-mp-restclient-plugin?logo=java&style=for-the-badge)](https://maven-badges.herokuapp.com/maven-central/org.tkit.maven/tkit-mp-restclient-plugin)
+[![GitHub Actions Status](<https://img.shields.io/github/workflow/status/1000kit/tkit-mp-restclient-plugin/build?logo=GitHub&style=for-the-badge>)](https://github.com/1000kit/tkit-mp-restclient-plugin/actions/workflows/build.yml)
+
 > Version 0.15.0 new configuration preserveEnumCase. By default false, if set to true:
   - Generated enum names are case-sensitive, not forced uppercase anymore
   - Common prefix enum name removal is disabled https://github.com/swagger-api/swagger-codegen/issues/5932

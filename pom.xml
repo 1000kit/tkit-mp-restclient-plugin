@@ -5,12 +5,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tkit.maven</groupId>
 	<artifactId>tkit-mp-restclient-plugin</artifactId>
-	<version>0.16.0-SNAPSHOT</version>
+	<version>999-SNAPSHOT</version>
 	<name>tkit-mp-restclient-plugin</name>
 	<packaging>maven-plugin</packaging>
 
     <description>tkit microprofile rest client maven plugin</description>
-    <url>https://gitlab.com/1000kit/maven/tkit-mp-restclient-plugin</url>
+    <url>https://github.com/1000kit/tkit-mp-restclient-plugin</url>
 
     <licenses>
         <license>
@@ -21,9 +21,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://gitlab.com/1000kit/maven/tkit-mp-restclientt-plugin.git</connection>
-        <developerConnection>scm:git:git@gitlab.com:1000kit/maven/tkit-mp-restclient-plugin.git</developerConnection>
-        <url>https://gitlab.com/1000kit/maven/tkit-mp-restclient-plugin</url>
+        <connection>scm:git:https://github.com/1000kit/tkit-mp-restclient-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:1000kit/tkit-mp-restclient-plugin.git</developerConnection>
+        <url>https://github.com/1000kit/tkit-mp-restclient-plugin</url>
     </scm>
 
     <organization>
