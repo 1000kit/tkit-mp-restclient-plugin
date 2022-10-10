@@ -580,6 +580,14 @@ public class MicroProfileRestClientCodegen extends AbstractJavaJAXRSServerCodege
     }
 
     @Override
+    public void setGitRepoBaseURL(String s) { }
+
+    @Override
+    public String getGitRepoBaseURL() {
+        return null;
+    }
+
+    @Override
     public boolean checkAliasModel() {
         return false;
     }
