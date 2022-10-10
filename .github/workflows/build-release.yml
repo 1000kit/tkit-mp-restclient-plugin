@@ -8,4 +8,4 @@ jobs:
     uses: 1000kit/tkit-ci-java/.github/workflows/build-release.yml@main
     secrets: inherit
     with:
-      java-version: '11'
+      java-version: '17'
