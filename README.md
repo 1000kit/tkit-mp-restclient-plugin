@@ -1,3 +1,5 @@
+This plugin is **deprecated** please use [quarkus-openapi-generator](https://github.com/quarkiverse/quarkus-openapi-generator)
+
 # tkit-mp-rest-client-plugin
 
 Tkit microprofile  rest client generator plugin
